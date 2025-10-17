@@ -1,0 +1,475 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Software License Agent API",
+    "version": "1.0.0",
+    "description": "Action group APIs for Software License Intelligence Agent"
+  },
+  "paths": {
+    "/query-license-data": {
+      "post": {
+        "summary": "Query license inventory and usage data",
+        "description": "Retrieve license information including utilization rates, costs, and vendor details",
+        "operationId": "queryLicenseData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vendor": {
+                    "type": "string",
+                    "description": "Filter by specific vendor name"
+                  },
+                  "product": {
+                    "type": "string",
+                    "description": "Filter by specific product name"
+                  },
+                  "license_id": {
+                    "type": "string",
+                    "description": "Specific license ID to query"
+                  },
+                  "include_usage": {
+                    "type": "boolean",
+                    "description": "Include detailed usage statistics",
+                    "default": true
+                  },
+                  "time_period": {
+                    "type": "string",
+                    "enum": ["day", "week", "month", "quarter", "year"],
+                    "description": "Time period for usage data",
+                    "default": "month"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with license data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "licenses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "totalLicenses": {
+                          "type": "number"
+                        },
+                        "totalCost": {
+                          "type": "number"
+                        },
+                        "averageUtilization": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assess-compliance": {
+      "post": {
+        "summary": "Assess license compliance and identify risks",
+        "description": "Check compliance status against license agreements and identify violations or risks",
+        "operationId": "assessCompliance",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "license_id": {
+                    "type": "string",
+                    "description": "Specific license ID to assess. If not provided, assesses all licenses"
+                  },
+                  "vendor": {
+                    "type": "string",
+                    "description": "Filter by vendor name"
+                  },
+                  "risk_level": {
+                    "type": "string",
+                    "enum": ["all", "high", "medium", "low"],
+                    "description": "Filter by risk level",
+                    "default": "all"
+                  },
+                  "include_remediation": {
+                    "type": "boolean",
+                    "description": "Include remediation steps in response",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compliance assessment with risks and remediation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "overallStatus": {
+                      "type": "string",
+                      "enum": ["compliant", "at-risk", "non-compliant"]
+                    },
+                    "risks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "financialExposure": {
+                      "type": "number"
+                    },
+                    "remediationSteps": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/optimize-license-costs": {
+      "post": {
+        "summary": "Identify cost optimization opportunities",
+        "description": "Analyze licenses and recommend cost-saving strategies including consolidation and rightsizing",
+        "operationId": "optimizeLicenseCosts",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "optimization_type": {
+                    "type": "string",
+                    "enum": ["all", "consolidation", "rightsizing", "alternative_vendors", "unused_removal"],
+                    "description": "Type of optimization to focus on",
+                    "default": "all"
+                  },
+                  "vendor": {
+                    "type": "string",
+                    "description": "Focus on specific vendor"
+                  },
+                  "min_savings": {
+                    "type": "number",
+                    "description": "Minimum annual savings threshold to include",
+                    "default": 1000
+                  },
+                  "include_roi": {
+                    "type": "boolean",
+                    "description": "Include ROI calculations",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cost optimization recommendations with savings calculations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "totalPotentialSavings": {
+                      "type": "number"
+                    },
+                    "opportunities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "prioritizedActions": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get-vendor-intelligence": {
+      "post": {
+        "summary": "Get vendor market intelligence for negotiations",
+        "description": "Retrieve market pricing, negotiation tactics, and competitive alternatives for vendor negotiations",
+        "operationId": "getVendorIntelligence",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["vendor_name"],
+                "properties": {
+                  "vendor_name": {
+                    "type": "string",
+                    "description": "Vendor name to research"
+                  },
+                  "intelligence_type": {
+                    "type": "string",
+                    "enum": ["all", "pricing", "alternatives", "negotiation_tactics", "market_trends"],
+                    "description": "Type of intelligence to retrieve",
+                    "default": "all"
+                  },
+                  "product": {
+                    "type": "string",
+                    "description": "Specific product for focused intelligence"
+                  },
+                  "contract_value": {
+                    "type": "number",
+                    "description": "Current or proposed contract value for context"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vendor intelligence with pricing and negotiation strategies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "marketPricing": {
+                      "type": "object"
+                    },
+                    "alternatives": {
+                      "type": "array"
+                    },
+                    "negotiationTactics": {
+                      "type": "array"
+                    },
+                    "leveragePoints": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/monitor-usage": {
+      "post": {
+        "summary": "Monitor real-time license usage and detect anomalies",
+        "description": "Track license usage patterns and identify anomalies or unusual activity",
+        "operationId": "monitorUsage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["license_id"],
+                "properties": {
+                  "license_id": {
+                    "type": "string",
+                    "description": "License ID to monitor"
+                  },
+                  "time_range": {
+                    "type": "string",
+                    "enum": ["hour", "day", "week", "month"],
+                    "description": "Time range for usage monitoring",
+                    "default": "day"
+                  },
+                  "detect_anomalies": {
+                    "type": "boolean",
+                    "description": "Enable anomaly detection",
+                    "default": true
+                  },
+                  "include_predictions": {
+                    "type": "boolean",
+                    "description": "Include usage predictions",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usage monitoring data with anomalies and trends",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "currentUsage": {
+                      "type": "object"
+                    },
+                    "trend": {
+                      "type": "string"
+                    },
+                    "anomalies": {
+                      "type": "array"
+                    },
+                    "predictions": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyze-vendor-communications": {
+      "post": {
+        "summary": "Analyze vendor communications using NLP",
+        "description": "Extract sentiment, key phrases, and entities from vendor emails and documents using Amazon Comprehend",
+        "operationId": "analyzeVendorCommunications",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["text"],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "description": "Communication text to analyze"
+                  },
+                  "vendor_name": {
+                    "type": "string",
+                    "description": "Vendor name for context"
+                  },
+                  "analysis_type": {
+                    "type": "string",
+                    "enum": ["all", "sentiment", "entities", "key_phrases"],
+                    "description": "Type of analysis to perform",
+                    "default": "all"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Communication analysis with sentiment and insights",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sentiment": {
+                      "type": "object"
+                    },
+                    "entities": {
+                      "type": "array"
+                    },
+                    "keyPhrases": {
+                      "type": "array"
+                    },
+                    "insights": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/extract-license-data": {
+      "post": {
+        "summary": "Extract data from license agreements using OCR",
+        "description": "Use Amazon Textract to extract terms, dates, and pricing from license agreement documents",
+        "operationId": "extractLicenseData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["document_s3_uri"],
+                "properties": {
+                  "document_s3_uri": {
+                    "type": "string",
+                    "description": "S3 URI of the license agreement document"
+                  },
+                  "vendor_name": {
+                    "type": "string",
+                    "description": "Vendor name for context"
+                  },
+                  "extract_fields": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["terms", "dates", "pricing", "restrictions", "all"]
+                    },
+                    "description": "Specific fields to extract",
+                    "default": ["all"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extracted license agreement data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "extractedData": {
+                      "type": "object"
+                    },
+                    "terms": {
+                      "type": "array"
+                    },
+                    "dates": {
+                      "type": "object"
+                    },
+                    "pricing": {
+                      "type": "object"
+                    },
+                    "restrictions": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

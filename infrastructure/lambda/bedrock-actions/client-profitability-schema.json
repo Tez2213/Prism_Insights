@@ -1,0 +1,256 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Client Profitability Agent API",
+    "version": "1.0.0",
+    "description": "Action group APIs for Client Profitability Intelligence Agent"
+  },
+  "paths": {
+    "/query-client-data": {
+      "post": {
+        "summary": "Query client financial data and metrics",
+        "description": "Retrieve client financial metrics including revenue, costs, margins, and historical data",
+        "operationId": "queryClientData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "description": "Specific client ID to query. If not provided, returns all clients"
+                  },
+                  "time_period": {
+                    "type": "string",
+                    "enum": ["month", "quarter", "year", "all"],
+                    "description": "Time period for historical data",
+                    "default": "all"
+                  },
+                  "metrics": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["revenue", "costs", "margin", "contracts"]
+                    },
+                    "description": "Specific metrics to retrieve",
+                    "default": ["revenue", "costs", "margin", "contracts"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with client data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "clients": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "summary": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyze-margins": {
+      "post": {
+        "summary": "Analyze client margins and detect erosion",
+        "description": "Perform detailed margin analysis including trends, comparisons, and forecasts",
+        "operationId": "analyzeMargins",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["client_id"],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "description": "Client ID to analyze"
+                  },
+                  "analysis_type": {
+                    "type": "string",
+                    "enum": ["current", "trend", "comparison", "forecast"],
+                    "description": "Type of margin analysis to perform",
+                    "default": "current"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful margin analysis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/predict-churn": {
+      "post": {
+        "summary": "Predict client churn risk using ML model",
+        "description": "Calculate churn risk score with contributing factors and recommendations",
+        "operationId": "predictChurn",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["client_id"],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "description": "Client ID to analyze for churn risk"
+                  },
+                  "include_factors": {
+                    "type": "boolean",
+                    "description": "Include detailed risk factors in response",
+                    "default": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Churn prediction with risk score and recommendations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "churnRisk": {
+                      "type": "number"
+                    },
+                    "riskLevel": {
+                      "type": "string"
+                    },
+                    "confidence": {
+                      "type": "string"
+                    },
+                    "factors": {
+                      "type": "array"
+                    },
+                    "recommendations": {
+                      "type": "array"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/optimize-contract": {
+      "post": {
+        "summary": "Recommend contract optimizations",
+        "description": "Generate contract optimization recommendations based on goals",
+        "operationId": "optimizeContract",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["client_id"],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "description": "Client ID to optimize"
+                  },
+                  "optimization_goals": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": ["increase_margin", "reduce_churn", "improve_satisfaction"]
+                    },
+                    "description": "Optimization goals to focus on",
+                    "default": ["increase_margin"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contract optimization recommendations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/optimize-service-tier": {
+      "post": {
+        "summary": "Recommend optimal service tier",
+        "description": "Analyze usage patterns and recommend appropriate service tier",
+        "operationId": "optimizeServiceTier",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["client_id"],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "description": "Client ID to analyze"
+                  },
+                  "current_tier": {
+                    "type": "string",
+                    "description": "Current service tier name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Service tier recommendation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

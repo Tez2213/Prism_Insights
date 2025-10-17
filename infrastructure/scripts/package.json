@@ -1,0 +1,19 @@
+{
+  "name": "infrastructure-scripts",
+  "version": "1.0.0",
+  "description": "Helper scripts for infrastructure management",
+  "scripts": {
+    "init-db": "node init-database.js",
+    "test-connection": "node test-connection.js",
+    "seed": "node seed-dynamodb.js",
+    "verify": "node verify-seed.js",
+    "clear": "node clear-tables.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudformation": "^3.450.0",
+    "@aws-sdk/client-lambda": "^3.450.0",
+    "@aws-sdk/client-secrets-manager": "^3.450.0",
+    "@aws-sdk/client-dynamodb": "^3.450.0",
+    "@aws-sdk/lib-dynamodb": "^3.450.0"
+  }
+}

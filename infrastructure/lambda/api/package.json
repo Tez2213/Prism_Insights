@@ -1,0 +1,9 @@
+{
+  "name": "prism-api-functions",
+  "version": "1.0.0",
+  "description": "Lambda functions for Prism Insights API",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.450.0",
+    "@aws-sdk/lib-dynamodb": "^3.450.0"
+  }
+}
