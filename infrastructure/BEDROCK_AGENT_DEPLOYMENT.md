@@ -126,7 +126,8 @@ Since Bedrock Agents don't have full CDK support yet, create the agent manually:
    - Agent name: `client-profitability-agent`
    - Description: `AI agent for analyzing client profitability, predicting churn, and optimizing contracts`
    - Agent resource role: Select the role from CDK outputs (`BedrockAgentRoleArn`)
-   - Foundation model: `Anthropic Claude 3.5 Sonnet`
+   - Foundation model: Select **"Anthropic"** → **"Claude 3.5 Sonnet v2"** (or use inference profile if available)
+   - **IMPORTANT:** If you see "Inference profile" option, select that instead of direct model access
 
 3. **Add Agent Instructions**
    
@@ -167,90 +168,46 @@ Since Bedrock Agents don't have full CDK support yet, create the agent manually:
 
 ### Step 6: Add Action Groups
 
-For each action group, follow these steps:
+**IMPORTANT:** Bedrock Agents have a limit of 10 APIs per agent. To stay within this limit, create only 2 action groups that contain all 8 functions.
 
-#### Action Group 1: Query Client Data
+#### Action Group 1: Core Analytics
 
 1. In the agent details, go to "Action groups" tab
 2. Click "Add action group"
 3. Configure:
-   - Action group name: `query-client-data`
-   - Description: `Retrieve client financial metrics and historical data`
+   - Action group name: `core-analytics`
+   - Description: `Query data, analyze margins, predict churn, and optimize contracts`
    - Action group type: `Define with API schemas`
    - Action group invocation: Select Lambda function
    - Lambda function: Select `QueryClientDataFunction` from the dropdown
-   - API Schema: Upload `lambda/bedrock-actions/client-profitability-schema.json`
+   - API Schema: Upload `lambda/bedrock-actions/core-analytics-schema.json`
 4. Click "Add"
 
-#### Action Group 2: Analyze Margins
+**This schema contains 4 APIs:**
+- `/query-client-data` - Retrieve client financial data
+- `/analyze-margins` - Perform margin analysis
+- `/predict-churn` - Calculate churn risk
+- `/optimize-contract` - Recommend contract optimizations
+
+#### Action Group 2: Advanced Features
 
 1. Click "Add action group"
 2. Configure:
-   - Action group name: `analyze-margins`
-   - Description: `Perform detailed margin analysis and identify erosion`
-   - Lambda function: Select `AnalyzeMarginsFunction`
-   - API Schema: Use the same schema file (it includes all endpoints)
+   - Action group name: `advanced-features`
+   - Description: `Sentiment analysis, document extraction, revenue forecasting, and service tier optimization`
+   - Action group type: `Define with API schemas`
+   - Action group invocation: Select Lambda function
+   - Lambda function: Select `QueryClientDataFunction` (same as above - all functions share the same code)
+   - API Schema: Upload `lambda/bedrock-actions/advanced-features-schema.json`
 3. Click "Add"
 
-#### Action Group 3: Predict Churn
+**This schema contains 4 APIs:**
+- `/optimize-service-tier` - Suggest optimal service tier
+- `/analyze-sentiment` - Analyze communication sentiment
+- `/extract-contract-data` - Extract data from documents
+- `/forecast-revenue` - Generate revenue forecasts
 
-1. Click "Add action group"
-2. Configure:
-   - Action group name: `predict-churn`
-   - Description: `Invoke ML model to predict client churn risk`
-   - Lambda function: Select `PredictChurnFunction`
-   - API Schema: Use the same schema file
-3. Click "Add"
-
-#### Action Group 4: Optimize Contract
-
-1. Click "Add action group"
-2. Configure:
-   - Action group name: `optimize-contract`
-   - Description: `Recommend contract optimizations and pricing adjustments`
-   - Lambda function: Select `OptimizeContractFunction`
-   - API Schema: Use the same schema file
-3. Click "Add"
-
-#### Action Group 5: Optimize Service Tier
-
-1. Click "Add action group"
-2. Configure:
-   - Action group name: `optimize-service-tier`
-   - Description: `Recommend optimal service tier based on usage patterns`
-   - Lambda function: Select `OptimizeServiceTierFunction`
-   - API Schema: Use the same schema file
-3. Click "Add"
-
-#### Action Group 6: Analyze Sentiment
-
-1. Click "Add action group"
-2. Configure:
-   - Action group name: `analyze-sentiment`
-   - Description: `Analyze sentiment from client communications using Comprehend`
-   - Lambda function: Select `AnalyzeSentimentFunction`
-   - API Schema: Use the same schema file
-3. Click "Add"
-
-#### Action Group 7: Extract Contract Data
-
-1. Click "Add action group"
-2. Configure:
-   - Action group name: `extract-contract-data`
-   - Description: `Extract data from contract documents using Textract`
-   - Lambda function: Select `ExtractContractDataFunction`
-   - API Schema: Use the same schema file
-3. Click "Add"
-
-#### Action Group 8: Forecast Revenue
-
-1. Click "Add action group"
-2. Configure:
-   - Action group name: `forecast-revenue`
-   - Description: `Forecast client revenue using time-series analysis`
-   - Lambda function: Select `ForecastRevenueFunction`
-   - API Schema: Use the same schema file
-3. Click "Add"
+**Total: 8 APIs across 2 action groups (4 + 4 = 8, well under the 10 API limit)**
 
 ### Step 7: Create Knowledge Base
 
@@ -268,13 +225,30 @@ For each action group, follow these steps:
 6. Click "Sync" to index the documents
 7. Wait for sync to complete (may take 5-10 minutes)
 
-### Step 8: Prepare Agent
+### Step 8: Update Lambda Permissions
+
+After creating the agent, you need to update Lambda permissions to allow the specific agent to invoke them.
+
+1. **Note your Agent ID** from the agent details page (e.g., `BYACCQ4C0S`)
+
+2. **Run the permission update script:**
+   ```powershell
+   # Windows PowerShell
+   cd scripts
+   .\update-lambda-permissions.ps1 -AgentId YOUR_AGENT_ID
+   ```
+   
+   Replace `YOUR_AGENT_ID` with your actual agent ID.
+
+3. **Wait for the script to complete** - it will update all 8 Lambda functions
+
+### Step 9: Prepare Agent
 
 1. In the agent details, click "Prepare" button
 2. Wait for preparation to complete (may take 2-3 minutes)
 3. This compiles the agent with all action groups and knowledge base
 
-### Step 9: Create Agent Alias
+### Step 10: Create Agent Alias
 
 1. In the agent details, go to "Aliases" tab
 2. Click "Create alias"
@@ -284,7 +258,7 @@ For each action group, follow these steps:
 4. Click "Create"
 5. Note the **Agent ID** and **Alias ID** - you'll need these for frontend integration
 
-### Step 10: Test the Agent
+### Step 11: Test the Agent
 
 1. In the agent details, click "Test" in the top right
 2. Try these test queries:
@@ -320,7 +294,7 @@ For each action group, follow these steps:
    - Responses include data and insights
    - Knowledge base is referenced when relevant
 
-### Step 11: Configure Frontend Integration
+### Step 12: Configure Frontend Integration
 
 1. Update `frontend/.env.local`:
    ```
@@ -337,7 +311,7 @@ For each action group, follow these steps:
 - [ ] All Lambda functions created
 - [ ] Knowledge base documents uploaded
 - [ ] Bedrock Agent created
-- [ ] All 8 action groups added
+- [ ] 2 action groups added (with all 8 APIs)
 - [ ] Knowledge base created and synced
 - [ ] Agent prepared successfully
 - [ ] Agent alias created
@@ -354,6 +328,27 @@ For each action group, follow these steps:
 3. Check CloudFormation console for error details
 4. Ensure IAM permissions are sufficient
 
+### Issue: "Access denied when calling Bedrock" Error
+
+**Solution:**
+This error occurs when Lambda functions don't have the correct permissions for the specific agent. The fix:
+
+1. **Get your Agent ID** from the agent details page in AWS Console
+
+2. **Run the permission update script:**
+   ```powershell
+   cd infrastructure/scripts
+   .\update-lambda-permissions.ps1 -AgentId YOUR_AGENT_ID
+   ```
+
+3. **Go back to your agent in AWS Console**
+
+4. **Click "Prepare"** to refresh the agent
+
+5. **Try testing again**
+
+The script adds a source ARN condition to each Lambda function's resource policy, ensuring only your specific agent can invoke them. This is a security best practice required by AWS Bedrock.
+
 ### Issue: Lambda Functions Not Invoked
 
 **Solution:**
@@ -361,6 +356,35 @@ For each action group, follow these steps:
 2. Verify IAM role has permissions to invoke Lambda
 3. Check CloudWatch Logs for Lambda errors
 4. Test Lambda functions directly first
+
+### Issue: "Number of enabled APIs exceeded limit" Error
+
+**Solution:**
+This error occurs when you have more than 10 APIs across all action groups. The fix:
+
+1. Delete all existing action groups from your agent
+2. Create only 2 action groups (as described in Step 6)
+3. Use the updated schema file that contains all 8 API endpoints
+4. Both action groups can use the same Lambda function
+5. This keeps you under the 10 API limit (4 APIs in group 1, 4 APIs in group 2)
+
+### Issue: Knowledge Base Creation Fails with "403 Forbidden" or "security_exception"
+
+**Solution:**
+This error occurs when the Bedrock Agent role lacks permissions for OpenSearch Serverless. The role needs additional permissions:
+
+1. Update the Bedrock Agent stack with OpenSearch Serverless permissions (already added in latest version)
+2. Redeploy the stack:
+   ```bash
+   cd infrastructure
+   cdk deploy prism-insights-bedrock-dev
+   ```
+3. After deployment completes, try creating the knowledge base again
+4. The role now includes:
+   - `aoss:APIAccessAll` - Access OpenSearch Serverless
+   - `aoss:CreateSecurityPolicy` - Create security policies
+   - `bedrock:CreateKnowledgeBase` - Create knowledge bases
+   - `bedrock:AssociateAgentKnowledgeBase` - Link KB to agent
 
 ### Issue: Knowledge Base Sync Fails
 

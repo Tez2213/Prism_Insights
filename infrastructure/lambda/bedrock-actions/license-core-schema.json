@@ -1,0 +1,196 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Software License Core API",
+    "version": "1.0.0",
+    "description": "Core license management APIs"
+  },
+  "paths": {
+    "/query-license-data": {
+      "post": {
+        "summary": "Query license inventory and usage data",
+        "description": "Retrieve license information including utilization rates, costs, and vendor details",
+        "operationId": "queryLicenseData",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vendor": {
+                    "type": "string",
+                    "description": "Filter by specific vendor name"
+                  },
+                  "product": {
+                    "type": "string",
+                    "description": "Filter by specific product name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with license data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "licenses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/assess-compliance": {
+      "post": {
+        "summary": "Assess license compliance and identify risks",
+        "description": "Check compliance status against license agreements",
+        "operationId": "assessCompliance",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vendor": {
+                    "type": "string",
+                    "description": "Filter by vendor name"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compliance assessment",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "risks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/optimize-costs": {
+      "post": {
+        "summary": "Identify cost optimization opportunities",
+        "description": "Analyze licenses and recommend cost-saving strategies",
+        "operationId": "optimizeCosts",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vendor": {
+                    "type": "string",
+                    "description": "Focus on specific vendor"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cost optimization recommendations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "savings": {
+                      "type": "number"
+                    },
+                    "opportunities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendor-intelligence": {
+      "post": {
+        "summary": "Get vendor market intelligence",
+        "description": "Retrieve market pricing and negotiation tactics",
+        "operationId": "vendorIntelligence",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["vendor_name"],
+                "properties": {
+                  "vendor_name": {
+                    "type": "string",
+                    "description": "Vendor name to research"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vendor intelligence",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pricing": {
+                      "type": "object"
+                    },
+                    "tactics": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

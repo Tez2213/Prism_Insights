@@ -1,0 +1,181 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Client Profitability Agent - Advanced Features API",
+        "version": "1.0.0",
+        "description": "Advanced feature APIs for Client Profitability Intelligence Agent"
+    },
+    "paths": {
+        "/optimize-service-tier": {
+            "post": {
+                "summary": "Recommend optimal service tier",
+                "description": "Analyze usage patterns and recommend appropriate service tier",
+                "operationId": "optimizeServiceTier",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "client_id"
+                                ],
+                                "properties": {
+                                    "client_id": {
+                                        "type": "string",
+                                        "description": "Client ID to analyze"
+                                    },
+                                    "current_tier": {
+                                        "type": "string",
+                                        "description": "Current service tier name"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Service tier recommendation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/analyze-sentiment": {
+            "post": {
+                "summary": "Analyze sentiment from client communications",
+                "description": "Use AWS Comprehend to analyze sentiment from emails, tickets, or messages",
+                "operationId": "analyzeSentiment",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "text"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "description": "Text content to analyze for sentiment"
+                                    },
+                                    "client_id": {
+                                        "type": "string",
+                                        "description": "Optional client ID for context"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Sentiment analysis results",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/extract-contract-data": {
+            "post": {
+                "summary": "Extract data from contract documents",
+                "description": "Use AWS Textract to extract structured data from contract PDFs or images",
+                "operationId": "extractContractData",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "document_url"
+                                ],
+                                "properties": {
+                                    "document_url": {
+                                        "type": "string",
+                                        "description": "S3 URL or path to contract document"
+                                    },
+                                    "client_id": {
+                                        "type": "string",
+                                        "description": "Client ID associated with contract"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Extracted contract data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/forecast-revenue": {
+            "post": {
+                "summary": "Forecast client revenue",
+                "description": "Generate revenue forecasts using time-series analysis",
+                "operationId": "forecastRevenue",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "client_id"
+                                ],
+                                "properties": {
+                                    "client_id": {
+                                        "type": "string",
+                                        "description": "Client ID to forecast"
+                                    },
+                                    "forecast_months": {
+                                        "type": "integer",
+                                        "description": "Number of months to forecast",
+                                        "default": 12,
+                                        "minimum": 1,
+                                        "maximum": 24
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Revenue forecast data",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

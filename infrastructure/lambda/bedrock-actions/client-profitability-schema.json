@@ -24,7 +24,12 @@
                   },
                   "time_period": {
                     "type": "string",
-                    "enum": ["month", "quarter", "year", "all"],
+                    "enum": [
+                      "month",
+                      "quarter",
+                      "year",
+                      "all"
+                    ],
                     "description": "Time period for historical data",
                     "default": "all"
                   },
@@ -32,10 +37,14 @@
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": ["revenue", "costs", "margin", "contracts"]
+                      "enum": [
+                        "revenue",
+                        "costs",
+                        "margin",
+                        "contracts"
+                      ]
                     },
-                    "description": "Specific metrics to retrieve",
-                    "default": ["revenue", "costs", "margin", "contracts"]
+                    "description": "Specific metrics to retrieve"
                   }
                 }
               }
@@ -78,7 +87,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["client_id"],
+                "required": [
+                  "client_id"
+                ],
                 "properties": {
                   "client_id": {
                     "type": "string",
@@ -86,7 +97,12 @@
                   },
                   "analysis_type": {
                     "type": "string",
-                    "enum": ["current", "trend", "comparison", "forecast"],
+                    "enum": [
+                      "current",
+                      "trend",
+                      "comparison",
+                      "forecast"
+                    ],
                     "description": "Type of margin analysis to perform",
                     "default": "current"
                   }
@@ -120,7 +136,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["client_id"],
+                "required": [
+                  "client_id"
+                ],
                 "properties": {
                   "client_id": {
                     "type": "string",
@@ -178,7 +196,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["client_id"],
+                "required": [
+                  "client_id"
+                ],
                 "properties": {
                   "client_id": {
                     "type": "string",
@@ -188,10 +208,13 @@
                     "type": "array",
                     "items": {
                       "type": "string",
-                      "enum": ["increase_margin", "reduce_churn", "improve_satisfaction"]
+                      "enum": [
+                        "increase_margin",
+                        "reduce_churn",
+                        "improve_satisfaction"
+                      ]
                     },
-                    "description": "Optimization goals to focus on",
-                    "default": ["increase_margin"]
+                    "description": "Optimization goals to focus on"
                   }
                 }
               }
@@ -223,7 +246,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["client_id"],
+                "required": [
+                  "client_id"
+                ],
                 "properties": {
                   "client_id": {
                     "type": "string",
@@ -241,6 +266,135 @@
         "responses": {
           "200": {
             "description": "Service tier recommendation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/analyze-sentiment": {
+      "post": {
+        "summary": "Analyze sentiment from client communications",
+        "description": "Use AWS Comprehend to analyze sentiment from emails, tickets, or messages",
+        "operationId": "analyzeSentiment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "description": "Text content to analyze for sentiment"
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Optional client ID for context"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sentiment analysis results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/extract-contract-data": {
+      "post": {
+        "summary": "Extract data from contract documents",
+        "description": "Use AWS Textract to extract structured data from contract PDFs or images",
+        "operationId": "extractContractData",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "document_url"
+                ],
+                "properties": {
+                  "document_url": {
+                    "type": "string",
+                    "description": "S3 URL or path to contract document"
+                  },
+                  "client_id": {
+                    "type": "string",
+                    "description": "Client ID associated with contract"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extracted contract data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/forecast-revenue": {
+      "post": {
+        "summary": "Forecast client revenue",
+        "description": "Generate revenue forecasts using time-series analysis",
+        "operationId": "forecastRevenue",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "client_id"
+                ],
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "description": "Client ID to forecast"
+                  },
+                  "forecast_months": {
+                    "type": "integer",
+                    "description": "Number of months to forecast",
+                    "default": 12,
+                    "minimum": 1,
+                    "maximum": 24
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Revenue forecast data",
             "content": {
               "application/json": {
                 "schema": {

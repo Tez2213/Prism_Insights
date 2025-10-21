@@ -1,0 +1,35 @@
+    {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "BedrockFullAccess",
+            "Effect": "Allow",
+            "Action": "bedrock:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "LambdaFullAccess",
+            "Effect": "Allow",
+            "Action": "lambda:*",
+            "Resource": "*"
+        },
+        {
+            "Sid": "S3Access",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::prism-knowledge-base-437639821856",
+                "arn:aws:s3:::prism-knowledge-base-437639821856/*"
+            ]
+        },
+        {
+            "Sid": "OpenSearchAccess",
+            "Effect": "Allow",
+            "Action": "aoss:*",
+            "Resource": "*"
+        }
+    ]
+}

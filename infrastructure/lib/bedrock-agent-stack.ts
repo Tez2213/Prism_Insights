@@ -128,7 +128,7 @@ export class BedrockAgentStack extends cdk.Stack {
     // Grant permissions to access knowledge base
     this.knowledgeBaseBucket.grantRead(bedrockAgentRole);
 
-    // Grant permissions to invoke Bedrock models
+    // Grant permissions to invoke Bedrock models and inference profiles
     bedrockAgentRole.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
@@ -136,8 +136,47 @@ export class BedrockAgentStack extends cdk.Stack {
         'bedrock:InvokeModelWithResponseStream',
       ],
       resources: [
-        `arn:aws:bedrock:${this.region}::foundation-model/anthropic.claude-3-5-sonnet-20240620-v1:0`,
+        `arn:aws:bedrock:${this.region}::foundation-model/*`,
+        `arn:aws:bedrock:${this.region}:${this.account}:inference-profile/*`,
       ],
+    }));
+
+    // Grant permissions to retrieve from knowledge base
+    bedrockAgentRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'bedrock:Retrieve',
+        'bedrock:RetrieveAndGenerate',
+      ],
+      resources: ['*'],
+    }));
+
+    // Grant permissions for Knowledge Base and OpenSearch Serverless
+    bedrockAgentRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'aoss:APIAccessAll',
+        'aoss:CreateSecurityPolicy',
+        'aoss:GetSecurityPolicy',
+        'aoss:UpdateSecurityPolicy',
+      ],
+      resources: ['*'],
+    }));
+
+    bedrockAgentRole.addToPolicy(new iam.PolicyStatement({
+      effect: iam.Effect.ALLOW,
+      actions: [
+        'bedrock:CreateKnowledgeBase',
+        'bedrock:GetKnowledgeBase',
+        'bedrock:ListKnowledgeBases',
+        'bedrock:AssociateAgentKnowledgeBase',
+        'bedrock:InvokeAgent',
+        'bedrock:GetAgent',
+        'bedrock:ListFoundationModels',
+        'bedrock:GetFoundationModel',
+        'bedrock:PrepareAgent',
+      ],
+      resources: ['*'],
     }));
 
     // Output role ARN
