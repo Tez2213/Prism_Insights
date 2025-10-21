@@ -3,7 +3,7 @@
  * Handles communication with the deployed Bedrock Agent via backend proxy
  */
 
-export type AgentType = 'client-profitability' | 'software-license';
+export type AgentType = 'client-profitability' | 'software-license' | 'sales-pipeline';
 
 export class BedrockAgentClient {
   private apiEndpoint = '/api/bedrock';

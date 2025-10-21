@@ -17,6 +17,10 @@ const AGENTS = {
     agentId: process.env.SOFTWARE_LICENSE_AGENT_ID || 'EHJ2IHTNQB',
     aliasId: process.env.SOFTWARE_LICENSE_AGENT_ALIAS_ID || 'PXIFCAVXPF',
   },
+  'sales-pipeline': {
+    agentId: process.env.SALES_PIPELINE_AGENT_ID || 'S7RTFSWJCU',
+    aliasId: process.env.SALES_PIPELINE_AGENT_ALIAS_ID || 'VMIGQIIM3O',
+  },
 };
 
 export async function POST(request: NextRequest) {

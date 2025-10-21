@@ -346,7 +346,7 @@ export default function SalesPipelinePage() {
           </CardContent>
         </Card>
 
-        <FloatingChat agentName="Sales Pipeline Optimization" />
+        <FloatingChat agentName="Sales Pipeline Optimization" agentType="sales-pipeline" />
       </div>
     </div>
   );
