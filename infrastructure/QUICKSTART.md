@@ -1,14 +1,14 @@
-# 🚀 Quick Start Guide - Seed Your DynamoDB Tables
+# Quick Start Guide - Seed Your DynamoDB Tables
 
 ## What You Need
 
-✅ DynamoDB tables deployed (you said they're done!)  
-✅ AWS credentials configured  
-✅ Frontend mock data files  
+- DynamoDB tables deployed
+- AWS credentials configured
+- Frontend mock data files
 
 ## 3 Simple Commands
 
-### 1️⃣ Install Dependencies
+### 1. Install Dependencies
 
 ```bash
 cd infrastructure/scripts
@@ -17,7 +17,7 @@ npm install
 
 This installs the AWS SDK packages needed to write to DynamoDB.
 
-### 2️⃣ Seed the Data
+### 2. Seed the Data
 
 ```bash
 npm run seed
@@ -52,7 +52,7 @@ Table Prefix: prism-
 ✅ All tables seeded successfully!
 ```
 
-### 3️⃣ Verify It Worked
+### 3. Verify It Worked
 
 ```bash
 npm run verify
@@ -65,34 +65,34 @@ npm run verify
 
 **Expected output:**
 ```
-🔍 DynamoDB Seed Verification
+DynamoDB Seed Verification
 ============================================================
 
-📊 clients         (prism-clients)
-  ✅ 8 items found
-  📝 Sample: TechFlow Solutions
+clients         (prism-clients)
+  8 items found
+  Sample: TechFlow Solutions
 
-📊 licenses        (prism-licenses)
-  ✅ 10 items found
-  📝 Sample: Microsoft 365 Business Premium
+licenses        (prism-licenses)
+  10 items found
+  Sample: Microsoft 365 Business Premium
 
 ...
 
-🎉 All tables are properly seeded!
+All tables are properly seeded!
 ```
 
-## That's It! 🎉
+## That's It!
 
 Your DynamoDB tables now have all the mock data from your frontend.
 
 ## Next Steps
 
 Now you can:
-1. ✅ Create Lambda functions to read from DynamoDB
-2. ✅ Update frontend to call Lambda instead of using local files
-3. ✅ Add real-time updates
+1. Create Lambda functions to read from DynamoDB
+2. Update frontend to call Lambda instead of using local files
+3. Add real-time updates
 
-See `SIMPLE_PLAN.md` for the complete roadmap.
+See the main README.md for complete documentation.
 
 ## Troubleshooting
 

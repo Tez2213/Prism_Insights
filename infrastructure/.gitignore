@@ -24,3 +24,10 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Lambda node_modules (keep source, ignore dependencies)
+lambda/*/node_modules/
+scripts/node_modules/
+
+# CDK context
+cdk.context.json

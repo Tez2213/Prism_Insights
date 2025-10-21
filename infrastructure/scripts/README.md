@@ -1,6 +1,6 @@
 # Infrastructure Scripts
 
-## 🌱 Seeding DynamoDB with Mock Data
+## Seeding DynamoDB with Mock Data
 
 ### Prerequisites
 
@@ -41,36 +41,36 @@ The seeding script will:
 
 ```
 ============================================================
-🌱 DynamoDB Seeding Script
+DynamoDB Seeding Script
 ============================================================
 Region: us-east-2
 Environment: dev
 Table Prefix: prism-
 ============================================================
 
-📊 Seeding clients...
+Seeding clients...
   Found 8 items
   Writing 8 items in 1 batch(es)...
-  ✓ Batch 1/1 written
-  ✅ Successfully seeded clients table
+  Batch 1/1 written
+  Successfully seeded clients table
 
-📊 Seeding licenses...
+Seeding licenses...
   Found 10 items
   Writing 10 items in 1 batch(es)...
-  ✓ Batch 1/1 written
-  ✅ Successfully seeded licenses table
+  Batch 1/1 written
+  Successfully seeded licenses table
 
 ... (continues for all tables)
 
 ============================================================
-✅ All tables seeded successfully!
+All tables seeded successfully!
 ============================================================
 
-📋 Summary:
+Summary:
   Tables seeded: 7
   Region: us-east-2
 
-🎉 Your data is ready to use!
+Your data is ready to use!
 ```
 
 ### Troubleshooting
@@ -119,4 +119,4 @@ After seeding:
 2. Update frontend to call Lambda functions instead of using local mock data
 3. Test the integration
 
-See `SIMPLE_PLAN.md` for the complete implementation guide.
+See the main infrastructure README.md for complete documentation.
