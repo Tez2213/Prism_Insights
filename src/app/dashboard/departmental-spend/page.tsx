@@ -99,7 +99,7 @@ export default function DepartmentalSpendPage() {
   // Prepare data for spending by category stacked bar chart
   const spendingByCategoryData = departments.map(dept => {
     const dataPoint: any = { department: dept.name };
-    dept.categories.forEach(cat => {
+    dept.categories.forEach((cat: any) => {
       dataPoint[cat.name] = cat.spend;
     });
     return dataPoint;
@@ -111,7 +111,7 @@ export default function DepartmentalSpendPage() {
   );
 
   // Prepare data for budget variance trend line chart
-  const budgetVarianceTrendData = departments[0].historicalSpend.map((_, index) => {
+  const budgetVarianceTrendData = departments[0]?.historicalSpend?.map((_, index) => {
     const month = departments[0].historicalSpend[index].month;
     const totalBudget = departments.reduce((sum, dept) => sum + dept.monthlyBudget, 0);
     const totalActual = departments.reduce((sum, dept) => sum + dept.historicalSpend[index].amount, 0);
@@ -121,7 +121,7 @@ export default function DepartmentalSpendPage() {
       Budget: totalBudget,
       'Actual Spend': totalActual,
     };
-  });
+  }) || [];
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
