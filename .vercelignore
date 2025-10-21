@@ -1,0 +1,21 @@
+# Ignore infrastructure folder
+infrastructure/
+
+# Ignore documentation
+DEPLOYMENT_GUIDE.md
+DEPLOYMENT_RECOMMENDATION.md
+DEPLOYMENT_CHECKLIST.md
+
+# Ignore IDE settings
+.vscode/
+.kiro/
+
+# Ignore git
+.git/
+
+# Ignore local env
+.env.local
+
+# Ignore build artifacts
+.next/
+node_modules/
