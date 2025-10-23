@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/table';
 import { TableHeaderWithTooltip } from '@/components/ui/table-header-with-tooltip';
 import { Key, DollarSign, TrendingDown, AlertCircle } from 'lucide-react';
-import { apiClient } from '@/lib/api/client';
+import { simulatorClient } from '@/lib/api/simulator-client';
 import { cn } from '@/lib/utils';
 import { PieChart } from '@/components/charts/pie-chart';
 import { BarChart } from '@/components/charts/bar-chart';
@@ -30,16 +30,41 @@ export default function SoftwareLicensePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await apiClient.getLicenses();
-        setLicenses(data);
+        const data = await simulatorClient.getLicenses();
+        // Transform simulator data to match expected format
+        const transformedData = data.map((license: any) => ({
+          id: license.id,
+          vendor: license.vendor,
+          product: license.product,
+          quantity: license.totalLicenses,
+          utilized: license.usedLicenses,
+          utilizationRate: license.utilizationRate,
+          monthlyCost: license.totalCost / 12,
+          potentialSavings: (license.totalLicenses - license.usedLicenses) * (license.costPerLicense / 12),
+          status: license.utilizationRate >= 90 ? 'optimal' : license.utilizationRate >= 70 ? 'underutilized' : 'overutilized',
+        }));
+        setLicenses(transformedData);
       } catch (error) {
         console.error('Error fetching licenses:', error);
       } finally {
         setIsLoading(false);
       }
     }
+    
+    // Initial fetch
     fetchData();
+    
+    // Auto-refresh every 3 seconds
+    const interval = setInterval(fetchData, 3000);
+    return () => clearInterval(interval);
   }, []);
+  // Dynamic status calculation based on utilization
+  const calculateStatus = (utilizationRate: number) => {
+    if (utilizationRate >= 85) return 'optimal';
+    if (utilizationRate >= 60) return 'underutilized';
+    return 'overutilized';
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'optimal':
@@ -52,6 +77,9 @@ export default function SoftwareLicensePage() {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Sort licenses by utilization rate (leaderboard style)
+  const sortedLicenses = [...licenses].sort((a, b) => b.utilizationRate - a.utilizationRate);
 
   const totalLicenses = licenses.reduce((sum, license) => sum + license.quantity, 0);
   const totalUtilized = licenses.reduce((sum, license) => sum + license.utilized, 0);
@@ -241,35 +269,44 @@ export default function SoftwareLicensePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {licenses.map((license) => (
-                  <TableRow key={license.id} className="cursor-pointer hover:bg-gray-50">
-                    <TableCell className="font-medium">{license.vendor}</TableCell>
-                    <TableCell className="text-gray-600">{license.product}</TableCell>
-                    <TableCell className="text-right">{license.quantity}</TableCell>
-                    <TableCell className="text-right">{license.utilized}</TableCell>
-                    <TableCell className="text-right">
-                      <span className={cn(
-                        'font-medium',
-                        license.utilizationRate >= 90 ? 'text-green-600' :
-                        license.utilizationRate >= 70 ? 'text-yellow-600' :
-                        'text-red-600'
-                      )}>
-                        {license.utilizationRate}%
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      ${license.monthlyCost.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="text-right font-medium text-green-600">
-                      {license.potentialSavings > 0 ? `$${license.potentialSavings.toLocaleString()}` : '-'}
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(license.status)}>
-                        {license.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {sortedLicenses.map((license, index) => {
+                  const dynamicStatus = calculateStatus(license.utilizationRate);
+                  
+                  return (
+                    <TableRow key={license.id} className="cursor-pointer hover:bg-gray-50 transition-all duration-300">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400 font-mono w-6">#{index + 1}</span>
+                          {license.vendor}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-gray-600">{license.product}</TableCell>
+                      <TableCell className="text-right font-mono">{license.quantity}</TableCell>
+                      <TableCell className="text-right font-mono">{license.utilized}</TableCell>
+                      <TableCell className="text-right">
+                        <span className={cn(
+                          'font-medium font-mono',
+                          license.utilizationRate >= 85 ? 'text-green-600' :
+                          license.utilizationRate >= 60 ? 'text-yellow-600' :
+                          'text-red-600'
+                        )}>
+                          {license.utilizationRate.toFixed(1)}%
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right font-mono">
+                        ${Math.round(license.monthlyCost).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right font-medium text-green-600 font-mono">
+                        {license.potentialSavings > 0 ? `$${Math.round(license.potentialSavings).toLocaleString()}` : '-'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(dynamicStatus)}>
+                          {dynamicStatus}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>

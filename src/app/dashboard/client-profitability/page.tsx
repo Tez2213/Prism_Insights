@@ -21,7 +21,7 @@ import { LineChart } from '@/components/charts/line-chart';
 import { BarChart } from '@/components/charts/bar-chart';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 import { TrendingUp, DollarSign, Users, AlertTriangle } from 'lucide-react';
-import { apiClient } from '@/lib/api/client';
+import { simulatorClient } from '@/lib/api/simulator-client';
 import type { Client } from '@/types';
 
 export default function ClientProfitabilityPage() {
@@ -33,20 +33,52 @@ export default function ClientProfitabilityPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await apiClient.getClients();
-        setClients(data);
+        const data = await simulatorClient.getClients();
+        // Transform simulator data to match Client type
+        const transformedData = data.map((client: any) => ({
+          id: client.id,
+          companyName: client.name,
+          industry: client.industry,
+          monthlyRevenue: client.monthlyRecurring,
+          monthlyCosts: client.annualCosts / 12,
+          marginPercentage: ((client.annualRevenue - client.annualCosts) / client.annualRevenue) * 100,
+          status: client.status.toLowerCase().replace(' ', '-'),
+          churnRisk: client.churnRisk.toLowerCase(),
+          employeeCount: client.employeeCount,
+          contractValue: client.contractValue,
+        }));
+        setClients(transformedData);
       } catch (error) {
         console.error('Error fetching clients:', error);
       } finally {
         setIsLoading(false);
       }
     }
+    
+    // Initial fetch
     fetchData();
+    
+    // Auto-refresh every 3 seconds
+    const interval = setInterval(fetchData, 3000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleClientClick = (client: Client) => {
     setSelectedClient(client);
     setIsModalOpen(true);
+  };
+
+  // Dynamic status calculation based on margin
+  const calculateStatus = (marginPercentage: number) => {
+    if (marginPercentage < 20) return 'at-risk';
+    return 'active';
+  };
+
+  // Dynamic churn risk calculation based on margin
+  const calculateChurnRisk = (marginPercentage: number) => {
+    if (marginPercentage < 15) return 'high';
+    if (marginPercentage < 25) return 'medium';
+    return 'low';
   };
 
   const getChurnRiskColor = (risk: string) => {
@@ -75,6 +107,9 @@ export default function ClientProfitabilityPage() {
     }
   };
 
+  // Sort clients by revenue (leaderboard style)
+  const sortedClients = [...clients].sort((a, b) => b.monthlyRevenue - a.monthlyRevenue);
+
   const totalRevenue = clients.reduce((sum, client) => sum + client.monthlyRevenue, 0);
   const totalCosts = clients.reduce((sum, client) => sum + client.monthlyCosts, 0);
   const avgMargin = ((totalRevenue - totalCosts) / totalRevenue) * 100;
@@ -90,12 +125,12 @@ export default function ClientProfitabilityPage() {
     { month: 'Jun', 'TechCorp Solutions': 28.9, 'DataSystems Inc': 38.7, 'CloudFirst Ltd': 26.3, 'SecureNet Group': 42.3 },
   ];
 
-  // Generate margin comparison data for bar chart
-  const marginComparisonData = clients.map(client => ({
+  // Generate margin comparison data for bar chart (top 10)
+  const marginComparisonData = sortedClients.slice(0, 10).map(client => ({
     name: client.companyName.split(' ')[0], // Use first word for shorter labels
     margin: client.marginPercentage,
     fill: client.marginPercentage < 30 ? 'hsl(var(--destructive))' : 'hsl(var(--chart-1))',
-  })).sort((a, b) => b.margin - a.margin);
+  }));
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -255,32 +290,44 @@ export default function ClientProfitabilityPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {clients.map((client) => (
-                    <TableRow 
-                      key={client.id} 
-                      className="cursor-pointer hover:bg-gray-50 transition-colors"
-                      onClick={() => handleClientClick(client)}
-                    >
-                      <TableCell className="font-medium">{client.companyName}</TableCell>
-                      <TableCell className="text-gray-600">{client.industry}</TableCell>
-                      <TableCell className="text-right">
-                        ${client.monthlyRevenue.toLocaleString()}
-                      </TableCell>
-                      <TableCell className="text-right font-medium">
-                        {client.marginPercentage.toFixed(1)}%
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(client.status)}>
-                          {client.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getChurnRiskColor(client.churnRisk)}>
-                          {client.churnRisk}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {sortedClients.map((client, index) => {
+                    const dynamicStatus = calculateStatus(client.marginPercentage);
+                    const dynamicChurnRisk = calculateChurnRisk(client.marginPercentage);
+                    
+                    return (
+                      <TableRow 
+                        key={client.id} 
+                        className="cursor-pointer hover:bg-gray-50 transition-all duration-300"
+                        onClick={() => handleClientClick(client)}
+                      >
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-400 font-mono w-6">#{index + 1}</span>
+                            {client.companyName}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-gray-600">{client.industry}</TableCell>
+                        <TableCell className="text-right font-mono">
+                          ${Math.round(client.monthlyRevenue).toLocaleString()}
+                        </TableCell>
+                        <TableCell className="text-right font-medium font-mono">
+                          <span className={client.marginPercentage >= 30 ? 'text-green-600' : client.marginPercentage >= 20 ? 'text-yellow-600' : 'text-red-600'}>
+                            {client.marginPercentage.toFixed(1)}%
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getStatusColor(dynamicStatus)}>
+                            {dynamicStatus}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={getChurnRiskColor(dynamicChurnRisk)}>
+                            {dynamicChurnRisk}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>

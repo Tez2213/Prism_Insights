@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/table';
 import { TableHeaderWithTooltip } from '@/components/ui/table-header-with-tooltip';
 import { Target, DollarSign, TrendingUp, Users } from 'lucide-react';
-import { apiClient } from '@/lib/api/client';
+import { simulatorClient } from '@/lib/api/simulator-client';
 import { cn } from '@/lib/utils';
 import { BarChart } from '@/components/charts/bar-chart';
 import { LineChart } from '@/components/charts/line-chart';
@@ -30,21 +30,52 @@ export default function SalesPipelinePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await apiClient.getLeads();
-        setLeads(data);
+        const data = await simulatorClient.getLeads();
+        // Transform simulator data to match expected format
+        const transformedData = data.map((lead: any) => ({
+          id: lead.id,
+          companyName: lead.companyName,
+          contactName: lead.contactName,
+          contactEmail: lead.email,
+          industry: lead.industry,
+          estimatedValue: lead.value,
+          aiScore: lead.probability,
+          conversionProbability: lead.probability,
+          status: lead.stage.toLowerCase().replace(' ', '-'),
+          source: lead.source,
+        }));
+        setLeads(transformedData);
       } catch (error) {
         console.error('Error fetching leads:', error);
       } finally {
         setIsLoading(false);
       }
     }
+    
+    // Initial fetch
     fetchData();
+    
+    // Auto-refresh every 3 seconds
+    const interval = setInterval(fetchData, 3000);
+    return () => clearInterval(interval);
   }, []);
+  // Dynamic status mapping based on probability
+  const calculateStatus = (probability: number) => {
+    if (probability >= 90) return 'closed-won';
+    if (probability >= 75) return 'negotiation';
+    if (probability >= 50) return 'proposal';
+    if (probability >= 25) return 'qualified';
+    return 'prospecting';
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
+      case 'prospecting':
+        return 'bg-blue-100 text-blue-800';
       case 'new':
         return 'bg-blue-100 text-blue-800';
       case 'qualified':
+      case 'qualification':
         return 'bg-purple-100 text-purple-800';
       case 'proposal':
         return 'bg-yellow-100 text-yellow-800';
@@ -60,10 +91,13 @@ export default function SalesPipelinePage() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-green-600 bg-green-50';
-    if (score >= 70) return 'text-yellow-600 bg-yellow-50';
+    if (score >= 75) return 'text-green-600 bg-green-50';
+    if (score >= 50) return 'text-yellow-600 bg-yellow-50';
     return 'text-red-600 bg-red-50';
   };
+
+  // Sort leads by estimated value (leaderboard style)
+  const sortedLeads = [...leads].sort((a, b) => b.estimatedValue - a.estimatedValue);
 
   const totalValue = leads.reduce((sum, lead) => sum + lead.estimatedValue, 0);
   const avgScore = leads.reduce((sum, lead) => sum + lead.aiScore, 0) / leads.length;
@@ -309,38 +343,49 @@ export default function SalesPipelinePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {leads.map((lead) => (
-                  <TableRow key={lead.id} className="cursor-pointer hover:bg-gray-50">
-                    <TableCell className="font-medium">{lead.companyName}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="text-sm font-medium">{lead.contactName}</p>
-                        <p className="text-xs text-gray-500">{lead.contactEmail}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-gray-600">{lead.industry}</TableCell>
-                    <TableCell className="text-right font-medium">
-                      ${lead.estimatedValue.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <span className={cn(
-                        'inline-flex items-center justify-center rounded-full px-2 py-1 text-xs font-semibold',
-                        getScoreColor(lead.aiScore)
-                      )}>
-                        {lead.aiScore}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right font-medium">
-                      {lead.conversionProbability}%
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(lead.status)}>
-                        {lead.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-gray-600">{lead.source}</TableCell>
-                  </TableRow>
-                ))}
+                {sortedLeads.map((lead, index) => {
+                  const dynamicStatus = calculateStatus(lead.conversionProbability);
+                  
+                  return (
+                    <TableRow key={lead.id} className="cursor-pointer hover:bg-gray-50 transition-all duration-300">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400 font-mono w-6">#{index + 1}</span>
+                          {lead.companyName}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="text-sm font-medium">{lead.contactName}</p>
+                          <p className="text-xs text-gray-500">{lead.contactEmail}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-gray-600">{lead.industry}</TableCell>
+                      <TableCell className="text-right font-medium font-mono">
+                        ${Math.round(lead.estimatedValue).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <span className={cn(
+                          'inline-flex items-center justify-center rounded-full px-2 py-1 text-xs font-semibold font-mono',
+                          getScoreColor(lead.aiScore)
+                        )}>
+                          {lead.aiScore}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right font-medium font-mono">
+                        <span className={lead.conversionProbability >= 75 ? 'text-green-600' : lead.conversionProbability >= 50 ? 'text-yellow-600' : 'text-red-600'}>
+                          {lead.conversionProbability}%
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(dynamicStatus)}>
+                          {dynamicStatus}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-gray-600">{lead.source}</TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </CardContent>
