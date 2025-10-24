@@ -54,10 +54,10 @@ export default function ClientProfitabilityPage() {
         setIsLoading(false);
       }
     }
-    
+
     // Initial fetch
     fetchData();
-    
+
     // Auto-refresh every 3 seconds
     const interval = setInterval(fetchData, 3000);
     return () => clearInterval(interval);
@@ -245,42 +245,42 @@ export default function ClientProfitabilityPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHeaderWithTooltip 
+                    <TableHeaderWithTooltip
                       className="w-[200px]"
                       tooltip="Client company name"
                       sortable
                     >
                       Client
                     </TableHeaderWithTooltip>
-                    <TableHeaderWithTooltip 
+                    <TableHeaderWithTooltip
                       className="w-[150px]"
                       tooltip="Industry sector or vertical market"
                       sortable
                     >
                       Industry
                     </TableHeaderWithTooltip>
-                    <TableHeaderWithTooltip 
+                    <TableHeaderWithTooltip
                       className="text-right w-[120px]"
                       tooltip="Monthly Recurring Revenue - predictable revenue from this client each month"
                       sortable
                     >
                       MRR
                     </TableHeaderWithTooltip>
-                    <TableHeaderWithTooltip 
+                    <TableHeaderWithTooltip
                       className="text-right w-[100px]"
                       tooltip="Profit margin percentage calculated as (Revenue - Cost) / Revenue × 100"
                       sortable
                     >
                       Margin
                     </TableHeaderWithTooltip>
-                    <TableHeaderWithTooltip 
+                    <TableHeaderWithTooltip
                       className="w-[120px]"
                       tooltip="Current client relationship status (active, at-risk, or churned)"
                       sortable
                     >
                       Status
                     </TableHeaderWithTooltip>
-                    <TableHeaderWithTooltip 
+                    <TableHeaderWithTooltip
                       className="w-[120px]"
                       tooltip="AI-predicted risk level of client canceling service (high, medium, or low)"
                       sortable
@@ -293,10 +293,10 @@ export default function ClientProfitabilityPage() {
                   {sortedClients.map((client, index) => {
                     const dynamicStatus = calculateStatus(client.marginPercentage);
                     const dynamicChurnRisk = calculateChurnRisk(client.marginPercentage);
-                    
+
                     return (
-                      <TableRow 
-                        key={client.id} 
+                      <TableRow
+                        key={client.id}
                         className="cursor-pointer hover:bg-gray-50 transition-all duration-300"
                         onClick={() => handleClientClick(client)}
                       >
@@ -340,7 +340,7 @@ export default function ClientProfitabilityPage() {
           onClose={() => setIsModalOpen(false)}
         />
 
-        <FloatingChat agentName="Client Profitability Intelligence" />
+        <FloatingChat agentName="Client Profitability Intelligence" agentType="client-profitability" />
       </div>
     </div>
   );

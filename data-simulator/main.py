@@ -58,9 +58,6 @@ async def update_data_periodically():
 
 async def sync_to_dynamodb():
     """Sync in-memory data to DynamoDB"""
-    # Disabled for local testing - enable when deploying to AWS
-    return
-    
     try:
         table_mapping = {
             "clients": "clients",

@@ -1,3 +1,30 @@
+# Prism Insights - AI-Powered Business Intelligence
+
+## 🚀 Quick Start
+
+### 1. Test Backend Locally
+```bash
+test-local.bat
+```
+Server starts on: http://localhost:8000
+
+### 2. Test Backend API
+```bash
+test-backend.bat
+```
+
+### 3. Start Frontend
+```bash
+npm install
+npm run dev
+```
+Visit: http://localhost:3000
+
+### 4. Deploy to EC2
+See: `DEPLOY.md`
+
+---
+
 # Prism Insights - AI-Powered Business Intelligence Platform
 
 A modern, AI-driven business intelligence platform built with Next.js 15 and AWS Bedrock Agents. Prism Insights provides intelligent analytics across multiple business domains including client profitability, software licensing, sales pipeline optimization, and more.
