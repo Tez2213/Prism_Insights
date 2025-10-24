@@ -1,9 +1,11 @@
 /**
  * API Client for Data Simulator
- * Connects to local Python server for real-time data
+ * Connects to backend via proxy to avoid CORS and mixed content issues
  */
 
-const SIMULATOR_BASE_URL = process.env.NEXT_PUBLIC_SIMULATOR_URL || 'http://localhost:8000';
+// Use proxy route for production, direct connection for local dev
+const USE_PROXY = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
+const SIMULATOR_BASE_URL = USE_PROXY ? '/api/proxy' : (process.env.NEXT_PUBLIC_SIMULATOR_URL || 'http://localhost:8000');
 
 class SimulatorClient {
   private baseUrl: string;
