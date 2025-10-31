@@ -355,18 +355,12 @@ class ReportGenerator {
    * Generate downloadable report
    */
   async generateReport(reportData: ReportData): Promise<Blob> {
-    // Check if simulator URL is configured
-    const simulatorUrl = process.env.NEXT_PUBLIC_SIMULATOR_URL;
-    
-    if (!simulatorUrl) {
-      throw new Error('Report server not configured. Please contact administrator.');
-    }
-
     // Get AI insights first
     const insights = await this.generateAIInsights(reportData);
     
-    // Call Python server to generate professional PDF
-    const response = await fetch(`${simulatorUrl}/api/generate-report`, {
+    // Call our API route (which proxies to EC2 server)
+    // This avoids CORS and mixed content issues
+    const response = await fetch('/api/generate-report', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -378,8 +372,8 @@ class ReportGenerator {
     });
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => 'Unknown error');
-      throw new Error(`Report generation failed: ${errorText}`);
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.error || 'Report generation failed');
     }
 
     // Get PDF blob
