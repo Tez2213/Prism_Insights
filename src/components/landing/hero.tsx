@@ -18,7 +18,7 @@ export function Hero() {
           >
             <Sparkles className="w-4 h-4 text-purple-600" />
             <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              SuperOps Hackathon 2025 - Round 2 Prototype
+              Powered by AWS Bedrock
             </span>
           </motion.div>
 

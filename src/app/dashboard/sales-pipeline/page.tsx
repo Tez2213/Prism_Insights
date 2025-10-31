@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { TopNavbar } from '@/components/dashboard/top-navbar';
 import { FloatingChat } from '@/components/agent/floating-chat';
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,10 +17,11 @@ import {
 } from '@/components/ui/table';
 import { TableHeaderWithTooltip } from '@/components/ui/table-header-with-tooltip';
 import { Target, DollarSign, TrendingUp, Users } from 'lucide-react';
-import { simulatorClient } from '@/lib/api/simulator-client';
+import { dataClient } from '@/lib/api/data-client';
 import { cn } from '@/lib/utils';
 import { BarChart } from '@/components/charts/bar-chart';
 import { LineChart } from '@/components/charts/line-chart';
+import { ZoomableChart } from '@/components/charts/zoomable-chart';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 export default function SalesPipelinePage() {
@@ -30,23 +31,24 @@ export default function SalesPipelinePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await simulatorClient.getLeads();
-        // Transform simulator data to match expected format
-        const transformedData = data.map((lead: any) => ({
-          id: lead.id,
-          companyName: lead.companyName,
-          contactName: lead.contactName,
-          contactEmail: lead.email,
-          industry: lead.industry,
-          estimatedValue: lead.value,
-          aiScore: lead.probability,
-          conversionProbability: lead.probability,
-          status: lead.stage.toLowerCase().replace(' ', '-'),
-          source: lead.source,
+        const data = await dataClient.getLeads();
+        // Transform simulator data to match expected format with safety checks
+        const transformedData = (data || []).map((lead: any) => ({
+          id: lead.id || Math.random().toString(),
+          companyName: lead.companyName || 'Unknown',
+          contactName: lead.contactName || 'Unknown',
+          contactEmail: lead.email || 'N/A',
+          industry: lead.industry || 'Unknown',
+          estimatedValue: lead.value || 0,
+          aiScore: lead.probability || 0,
+          conversionProbability: lead.probability || 0,
+          status: (lead.stage || 'prospecting').toLowerCase().replace(' ', '-'),
+          source: lead.source || 'Unknown',
         }));
         setLeads(transformedData);
       } catch (error) {
         console.error('Error fetching leads:', error);
+        setLeads([]);
       } finally {
         setIsLoading(false);
       }
@@ -101,19 +103,26 @@ export default function SalesPipelinePage() {
 
   const totalValue = leads.reduce((sum, lead) => sum + lead.estimatedValue, 0);
   const avgScore = leads.reduce((sum, lead) => sum + lead.aiScore, 0) / leads.length;
-  const avgConversion = leads.reduce((sum, lead) => sum + lead.conversionProbability, 0) / leads.length;
-  const qualifiedLeads = leads.filter((l) => l.status !== 'new').length;
+  const avgConversion = leads.length > 0 
+    ? leads.reduce((sum, lead) => sum + (lead.conversionProbability || 0), 0) / leads.length 
+    : 0;
+  const qualifiedLeads = leads.filter((l) => l.status !== 'new' && l.status !== 'prospecting').length;
 
-  // Pipeline funnel data
+  // Pipeline funnel data with safety checks
   const pipelineStages = [
-    { stage: 'New', count: leads.filter(l => l.status === 'new').length, value: leads.filter(l => l.status === 'new').reduce((sum, l) => sum + l.estimatedValue, 0) },
-    { stage: 'Qualified', count: leads.filter(l => l.status === 'qualified').length, value: leads.filter(l => l.status === 'qualified').reduce((sum, l) => sum + l.estimatedValue, 0) },
-    { stage: 'Proposal', count: leads.filter(l => l.status === 'proposal').length, value: leads.filter(l => l.status === 'proposal').reduce((sum, l) => sum + l.estimatedValue, 0) },
-    { stage: 'Negotiation', count: leads.filter(l => l.status === 'negotiation').length, value: leads.filter(l => l.status === 'negotiation').reduce((sum, l) => sum + l.estimatedValue, 0) },
-    { stage: 'Closed Won', count: leads.filter(l => l.status === 'closed-won').length, value: leads.filter(l => l.status === 'closed-won').reduce((sum, l) => sum + l.estimatedValue, 0) },
+    { stage: 'Prospecting', count: leads.filter(l => l.status === 'prospecting').length, value: leads.filter(l => l.status === 'prospecting').reduce((sum, l) => sum + (l.estimatedValue || 0), 0) },
+    { stage: 'Qualification', count: leads.filter(l => l.status === 'qualification').length, value: leads.filter(l => l.status === 'qualification').reduce((sum, l) => sum + (l.estimatedValue || 0), 0) },
+    { stage: 'Proposal', count: leads.filter(l => l.status === 'proposal').length, value: leads.filter(l => l.status === 'proposal').reduce((sum, l) => sum + (l.estimatedValue || 0), 0) },
+    { stage: 'Negotiation', count: leads.filter(l => l.status === 'negotiation').length, value: leads.filter(l => l.status === 'negotiation').reduce((sum, l) => sum + (l.estimatedValue || 0), 0) },
+    { stage: 'Closed Won', count: leads.filter(l => l.status === 'closed-won').length, value: leads.filter(l => l.status === 'closed-won').reduce((sum, l) => sum + (l.estimatedValue || 0), 0) },
   ];
 
-  // Calculate conversion rates
+  // Calculate conversion rates with colors
+  const getStageColor = (index: number) => {
+    const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#22c55e'];
+    return colors[index] || '#6b7280';
+  };
+
   const pipelineWithConversion = pipelineStages.map((stage, index) => {
     const conversionRate = index > 0 && pipelineStages[index - 1].count > 0
       ? ((stage.count / pipelineStages[index - 1].count) * 100).toFixed(1)
@@ -122,6 +131,7 @@ export default function SalesPipelinePage() {
       ...stage,
       conversionRate: `${conversionRate}%`,
       valueInK: Math.round(stage.value / 1000),
+      fill: getStageColor(index),
     };
   });
 
@@ -151,13 +161,11 @@ export default function SalesPipelinePage() {
   if (isLoading) {
     return (
       <div>
-        <DashboardHeader
+        <TopNavbar
           title="Sales Pipeline Optimization"
           description="AI-powered lead scoring and pipeline management"
-          alerts={[]}
         />
         <div className="p-8">
-          <Breadcrumb items={breadcrumbItems} className="mb-6" />
           <SkeletonDashboard />
         </div>
       </div>
@@ -166,14 +174,12 @@ export default function SalesPipelinePage() {
 
   return (
     <div>
-      <DashboardHeader
+      <TopNavbar
         title="Sales Pipeline Optimization"
         description="AI-powered lead scoring and pipeline management"
-        alerts={[]}
       />
 
       <div className="p-8">
-        <Breadcrumb items={breadcrumbItems} className="mb-6" />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <MetricCard
             label="Pipeline Value"
@@ -221,14 +227,15 @@ export default function SalesPipelinePage() {
               <CardTitle>Pipeline Funnel</CardTitle>
             </CardHeader>
             <CardContent>
-              <BarChart
-                data={pipelineWithConversion}
-                dataKeys={['count']}
-                xAxisKey="stage"
-                height={300}
-                colors={['hsl(var(--chart-1))']}
-                yAxisLabel="Number of Leads"
-              />
+              <ZoomableChart title="Pipeline Funnel - Detailed View">
+                <BarChart
+                  data={pipelineWithConversion}
+                  dataKeys={['count']}
+                  xAxisKey="stage"
+                  height={300}
+                  yAxisLabel="Number of Leads"
+                />
+              </ZoomableChart>
               <div className="mt-4 space-y-2">
                 {pipelineWithConversion.map((stage, index) => (
                   index > 0 && (
@@ -249,14 +256,15 @@ export default function SalesPipelinePage() {
               <CardTitle>Revenue Forecast</CardTitle>
             </CardHeader>
             <CardContent>
-              <LineChart
-                data={revenueForecast}
-                dataKeys={['projected', 'optimistic', 'pessimistic']}
-                xAxisKey="month"
-                height={300}
-                colors={['hsl(var(--chart-1))', 'hsl(var(--chart-3))', 'hsl(var(--chart-5))']}
-                yAxisLabel="Revenue ($K)"
-              />
+              <ZoomableChart title="Revenue Forecast - Detailed View">
+                <LineChart
+                  data={revenueForecast}
+                  dataKeys={['projected', 'optimistic', 'pessimistic']}
+                  xAxisKey="month"
+                  height={300}
+                  yAxisLabel="Revenue ($K)"
+                />
+              </ZoomableChart>
               <div className="mt-4 flex justify-around text-sm">
                 <div className="text-center">
                   <div className="text-muted-foreground">Pessimistic</div>

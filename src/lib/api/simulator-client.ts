@@ -1,17 +1,27 @@
 /**
  * API Client for Data Simulator
  * Connects to backend via proxy to avoid CORS and mixed content issues
+ * Can fetch from either simulator or DynamoDB via API Gateway
  */
 
-// Use proxy route for production, direct connection for local dev
+// Determine which data source to use
+const USE_DYNAMODB = process.env.NEXT_PUBLIC_USE_DYNAMODB === 'true';
+const API_GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Use proxy route for production simulator, direct connection for local dev
 const USE_PROXY = typeof window !== 'undefined' && window.location.hostname !== 'localhost';
 const SIMULATOR_BASE_URL = USE_PROXY ? '/api/proxy' : (process.env.NEXT_PUBLIC_SIMULATOR_URL || 'http://localhost:8000');
 
+// Choose the base URL based on configuration
+const BASE_URL = USE_DYNAMODB && API_GATEWAY_URL ? API_GATEWAY_URL : SIMULATOR_BASE_URL;
+
 class SimulatorClient {
   private baseUrl: string;
+  private useDynamoDB: boolean;
 
-  constructor(baseUrl: string = SIMULATOR_BASE_URL) {
+  constructor(baseUrl: string = BASE_URL) {
     this.baseUrl = baseUrl;
+    this.useDynamoDB = USE_DYNAMODB && !!API_GATEWAY_URL;
   }
 
   private async fetchWithRetry(url: string, retries = 3): Promise<any> {

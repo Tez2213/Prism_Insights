@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FloatingChat } from '@/components/agent/floating-chat';
 import { ClientDetailModal } from '@/components/agent/client-detail-modal';
-import { PageHeader } from '@/components/dashboard/page-header';
+import { TopNavbar } from '@/components/dashboard/top-navbar';
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -19,9 +19,9 @@ import {
 import { TableHeaderWithTooltip } from '@/components/ui/table-header-with-tooltip';
 import { LineChart } from '@/components/charts/line-chart';
 import { BarChart } from '@/components/charts/bar-chart';
-import { Breadcrumb } from '@/components/ui/breadcrumb';
+import { ZoomableChart } from '@/components/charts/zoomable-chart';
 import { TrendingUp, DollarSign, Users, AlertTriangle } from 'lucide-react';
-import { simulatorClient } from '@/lib/api/simulator-client';
+import { dataClient } from '@/lib/api/data-client';
 import type { Client } from '@/types';
 
 export default function ClientProfitabilityPage() {
@@ -33,23 +33,34 @@ export default function ClientProfitabilityPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await simulatorClient.getClients();
-        // Transform simulator data to match Client type
-        const transformedData = data.map((client: any) => ({
-          id: client.id,
-          companyName: client.name,
-          industry: client.industry,
-          monthlyRevenue: client.monthlyRecurring,
-          monthlyCosts: client.annualCosts / 12,
-          marginPercentage: ((client.annualRevenue - client.annualCosts) / client.annualRevenue) * 100,
-          status: client.status.toLowerCase().replace(' ', '-'),
-          churnRisk: client.churnRisk.toLowerCase(),
-          employeeCount: client.employeeCount,
-          contractValue: client.contractValue,
-        }));
+        const data = await dataClient.getClients();
+        console.log('Raw client data:', data); // Debug log
+        // Transform data to match Client type with safety checks
+        const transformedData = (data || []).map((client: any) => {
+          const annualRevenue = client.annualRevenue || 0;
+          const annualCosts = client.annualCosts || 0;
+          const marginPercentage = annualRevenue > 0 
+            ? ((annualRevenue - annualCosts) / annualRevenue) * 100 
+            : 0;
+          
+          return {
+            id: client.id || Math.random().toString(),
+            companyName: client.name || 'Unknown Company',
+            industry: client.industry || 'Unknown',
+            monthlyRevenue: client.monthlyRecurring || (annualRevenue / 12),
+            monthlyCosts: annualCosts / 12,
+            marginPercentage: marginPercentage,
+            status: (client.status || 'active').toLowerCase().replace(' ', '-'),
+            churnRisk: (client.churnRisk || 'low').toLowerCase(),
+            employeeCount: client.employeeCount || 0,
+            contractValue: client.contractValue || 0,
+          };
+        });
+        console.log('Transformed client data:', transformedData); // Debug log
         setClients(transformedData);
       } catch (error) {
         console.error('Error fetching clients:', error);
+        setClients([]); // Set empty array on error
       } finally {
         setIsLoading(false);
       }
@@ -115,48 +126,54 @@ export default function ClientProfitabilityPage() {
   const avgMargin = ((totalRevenue - totalCosts) / totalRevenue) * 100;
   const atRiskClients = clients.filter((c) => c.status === 'at-risk').length;
 
-  // Generate mock historical profitability data for line chart
+  // Generate historical profitability data for line chart using top 4 clients
+  const topClients = sortedClients.slice(0, 4);
   const profitabilityTrendData = [
-    { month: 'Jan', 'TechCorp Solutions': 26.5, 'DataSystems Inc': 36.2, 'CloudFirst Ltd': 24.8, 'SecureNet Group': 40.1 },
-    { month: 'Feb', 'TechCorp Solutions': 27.2, 'DataSystems Inc': 37.5, 'CloudFirst Ltd': 25.1, 'SecureNet Group': 41.2 },
-    { month: 'Mar', 'TechCorp Solutions': 26.8, 'DataSystems Inc': 38.1, 'CloudFirst Ltd': 25.9, 'SecureNet Group': 41.8 },
-    { month: 'Apr', 'TechCorp Solutions': 27.9, 'DataSystems Inc': 37.8, 'CloudFirst Ltd': 26.2, 'SecureNet Group': 42.0 },
-    { month: 'May', 'TechCorp Solutions': 28.3, 'DataSystems Inc': 38.3, 'CloudFirst Ltd': 26.0, 'SecureNet Group': 42.1 },
-    { month: 'Jun', 'TechCorp Solutions': 28.9, 'DataSystems Inc': 38.7, 'CloudFirst Ltd': 26.3, 'SecureNet Group': 42.3 },
+    { month: 'Jan', ...Object.fromEntries(topClients.map(c => [c.companyName, c.marginPercentage * 0.92])) },
+    { month: 'Feb', ...Object.fromEntries(topClients.map(c => [c.companyName, c.marginPercentage * 0.95])) },
+    { month: 'Mar', ...Object.fromEntries(topClients.map(c => [c.companyName, c.marginPercentage * 0.97])) },
+    { month: 'Apr', ...Object.fromEntries(topClients.map(c => [c.companyName, c.marginPercentage * 0.98])) },
+    { month: 'May', ...Object.fromEntries(topClients.map(c => [c.companyName, c.marginPercentage * 0.99])) },
+    { month: 'Jun', ...Object.fromEntries(topClients.map(c => [c.companyName, c.marginPercentage])) },
   ];
 
-  // Generate margin comparison data for bar chart (top 10)
-  const marginComparisonData = sortedClients.slice(0, 10).map(client => ({
-    name: client.companyName.split(' ')[0], // Use first word for shorter labels
-    margin: client.marginPercentage,
-    fill: client.marginPercentage < 30 ? 'hsl(var(--destructive))' : 'hsl(var(--chart-1))',
-  }));
-
-  const breadcrumbItems = [
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Client Profitability Intelligence' },
-  ];
+  // Generate margin comparison data for bar chart (top 10) with color coding
+  const marginComparisonData = sortedClients.slice(0, 10).map(client => {
+    const margin = client.marginPercentage || 0;
+    let fill;
+    if (margin < 0) fill = '#ef4444'; // Red for negative
+    else if (margin < 20) fill = '#f97316'; // Orange for low
+    else if (margin < 30) fill = '#eab308'; // Yellow for medium
+    else fill = '#22c55e'; // Green for good
+    
+    return {
+      name: (client.companyName || 'Unknown').split(' ')[0], // Use first word for shorter labels
+      margin: margin,
+      fill: fill,
+    };
+  });
 
   if (isLoading) {
     return (
-      <div className="p-8">
-        <Breadcrumb items={breadcrumbItems} className="mb-6" />
-        <PageHeader 
+      <div>
+        <TopNavbar 
           title="Client Profitability Intelligence"
           description="Real-time profitability analysis and optimization"
         />
-        <SkeletonDashboard />
+        <div className="p-8">
+          <SkeletonDashboard />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-8">
-      <Breadcrumb items={breadcrumbItems} className="mb-6" />
-      <PageHeader 
+    <div>
+      <TopNavbar 
         title="Client Profitability Intelligence"
         description="Real-time profitability analysis and optimization"
       />
+      <div className="p-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <MetricCard
             label="Total MRR"
@@ -204,13 +221,16 @@ export default function ClientProfitabilityPage() {
               <CardTitle>Profitability Trends</CardTitle>
             </CardHeader>
             <CardContent>
-              <LineChart
-                data={profitabilityTrendData}
-                dataKeys={['TechCorp Solutions', 'DataSystems Inc', 'CloudFirst Ltd', 'SecureNet Group']}
-                xAxisKey="month"
-                height={300}
-                yAxisLabel="Margin %"
-              />
+              <ZoomableChart title="Profitability Trends - Detailed View">
+                <LineChart
+                  data={profitabilityTrendData}
+                  dataKeys={topClients.map(c => c.companyName)}
+                  xAxisKey="month"
+                  height={300}
+                  yAxisLabel="Margin %"
+                  className="w-full"
+                />
+              </ZoomableChart>
             </CardContent>
           </Card>
 
@@ -219,13 +239,16 @@ export default function ClientProfitabilityPage() {
               <CardTitle>Client Margin Comparison</CardTitle>
             </CardHeader>
             <CardContent>
-              <BarChart
-                data={marginComparisonData}
-                dataKeys={['margin']}
-                xAxisKey="name"
-                height={300}
-                yAxisLabel="Margin %"
-              />
+              <ZoomableChart title="Client Margin Comparison - Detailed View">
+                <BarChart
+                  data={marginComparisonData}
+                  dataKeys={['margin']}
+                  xAxisKey="name"
+                  height={300}
+                  yAxisLabel="Margin %"
+                  className="w-full"
+                />
+              </ZoomableChart>
             </CardContent>
           </Card>
         </div>
@@ -335,6 +358,7 @@ export default function ClientProfitabilityPage() {
         />
 
         <FloatingChat agentName="Client Profitability Intelligence" agentType="client-profitability" />
+      </div>
     </div>
   );
 }

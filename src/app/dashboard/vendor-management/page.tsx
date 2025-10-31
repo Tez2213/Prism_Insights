@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { TopNavbar } from '@/components/dashboard/top-navbar';
 import { FloatingChat } from '@/components/agent/floating-chat';
 import { VendorDetailModal } from '@/components/agent/vendor-detail-modal';
 import { ContractDetailModal } from '@/components/agent/contract-detail-modal';
@@ -42,10 +42,33 @@ export default function VendorManagementPage() {
           apiClient.getVendors(),
           apiClient.getContracts(),
         ]);
-        setVendors(vendorsData);
-        setContracts(contractsData);
+        // Sanitize vendor data
+        const sanitizedVendors = (vendorsData || []).map((vendor: any) => ({
+          ...vendor,
+          annualValue: vendor.annualValue || 0,
+          performanceScore: vendor.performanceScore || 0,
+          name: vendor.name || 'Unknown',
+          contractType: vendor.contractType || 'N/A',
+          renewalDate: vendor.renewalDate || new Date().toISOString(),
+          status: vendor.status || 'active'
+        }));
+        // Sanitize contract data
+        const sanitizedContracts = (contractsData || []).map((contract: any) => ({
+          ...contract,
+          vendor: contract.vendor || 'Unknown',
+          type: contract.type || 'N/A',
+          value: contract.value || 0,
+          startDate: contract.startDate || new Date().toISOString(),
+          endDate: contract.endDate || new Date().toISOString(),
+          renewalStatus: contract.renewalStatus || 'manual',
+          status: contract.status || 'active'
+        }));
+        setVendors(sanitizedVendors);
+        setContracts(sanitizedContracts);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setVendors([]);
+        setContracts([]);
       } finally {
         setIsLoading(false);
       }
@@ -96,22 +119,22 @@ export default function VendorManagementPage() {
     return 'text-red-600';
   };
 
-  // Calculate metrics
+  // Calculate metrics with safety checks
   const activeVendors = vendors.filter(v => v.status === 'active').length;
-  const totalAnnualSpend = vendors.reduce((sum, vendor) => sum + vendor.annualValue, 0);
+  const totalAnnualSpend = vendors.reduce((sum, vendor) => sum + (vendor.annualValue || 0), 0);
   const contractsExpiringSoon = vendors.filter(v => v.status === 'expiring-soon').length;
   const activeContracts = contracts.length;
-  const averagePerformanceScore = Math.round(
-    vendors.reduce((sum, vendor) => sum + vendor.performanceScore, 0) / vendors.length
-  );
+  const averagePerformanceScore = vendors.length > 0 
+    ? Math.round(vendors.reduce((sum, vendor) => sum + (vendor.performanceScore || 0), 0) / vendors.length)
+    : 0;
 
   // Prepare vendor performance chart data
   const vendorPerformanceData = vendors
-    .sort((a, b) => b.performanceScore - a.performanceScore)
+    .sort((a, b) => (b.performanceScore || 0) - (a.performanceScore || 0))
     .slice(0, 10) // Top 10 vendors
     .map(vendor => ({
-      name: vendor.name,
-      score: vendor.performanceScore,
+      name: vendor.name || 'Unknown',
+      score: vendor.performanceScore || 0,
     }));
 
   // Get color for performance score
@@ -161,13 +184,11 @@ export default function VendorManagementPage() {
   if (isLoading) {
     return (
       <div>
-        <DashboardHeader
+        <TopNavbar
           title="Vendor & Contract Management"
           description="Manage vendor relationships and optimize contracts"
-          alerts={[]}
         />
         <div className="p-8">
-          <Breadcrumb items={breadcrumbItems} className="mb-6" />
           <SkeletonDashboard />
         </div>
       </div>
@@ -176,14 +197,12 @@ export default function VendorManagementPage() {
 
   return (
     <div>
-      <DashboardHeader
+      <TopNavbar
         title="Vendor & Contract Management"
         description="Manage vendor relationships and optimize contracts"
-        alerts={[]}
       />
 
       <div className="p-8">
-        <Breadcrumb items={breadcrumbItems} className="mb-6" />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <MetricCard
             label="Active Vendors"
@@ -324,17 +343,17 @@ export default function VendorManagementPage() {
                 </TableHeader>
                 <TableBody>
                   {vendors.map((vendor) => {
-                    const renewalDate = new Date(vendor.renewalDate);
+                    const renewalDate = vendor.renewalDate ? new Date(vendor.renewalDate) : new Date();
                     return (
                       <TableRow 
                         key={vendor.id} 
                         className="cursor-pointer hover:bg-gray-50 transition-colors"
                         onClick={() => handleVendorClick(vendor)}
                       >
-                        <TableCell className="font-medium">{vendor.name}</TableCell>
-                        <TableCell className="text-gray-600">{vendor.contractType}</TableCell>
+                        <TableCell className="font-medium">{vendor.name || 'Unknown'}</TableCell>
+                        <TableCell className="text-gray-600">{vendor.contractType || 'N/A'}</TableCell>
                         <TableCell className="text-right">
-                          ${vendor.annualValue.toLocaleString()}
+                          ${(vendor.annualValue || 0).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-gray-600">
                           {renewalDate.toLocaleDateString()}
@@ -431,17 +450,17 @@ export default function VendorManagementPage() {
                 </TableHeader>
                 <TableBody>
                   {contracts.map((contract) => {
-                    const startDate = new Date(contract.startDate);
-                    const endDate = new Date(contract.endDate);
+                    const startDate = contract.startDate ? new Date(contract.startDate) : new Date();
+                    const endDate = contract.endDate ? new Date(contract.endDate) : new Date();
                     return (
                       <TableRow 
-                        key={contract.id} 
+                        key={contract.id || Math.random().toString()} 
                         className="cursor-pointer hover:bg-gray-50 transition-colors"
                         onClick={() => handleContractClick(contract)}
                       >
-                        <TableCell className="font-medium">{contract.id}</TableCell>
-                        <TableCell className="text-gray-600">{contract.vendorName}</TableCell>
-                        <TableCell className="text-gray-600">{contract.serviceType}</TableCell>
+                        <TableCell className="font-medium">{contract.id || 'N/A'}</TableCell>
+                        <TableCell className="text-gray-600">{contract.vendorName || 'Unknown'}</TableCell>
+                        <TableCell className="text-gray-600">{contract.serviceType || 'N/A'}</TableCell>
                         <TableCell className="text-gray-600 text-sm">
                           {startDate.toLocaleDateString()}
                         </TableCell>
@@ -449,19 +468,19 @@ export default function VendorManagementPage() {
                           {endDate.toLocaleDateString()}
                         </TableCell>
                         <TableCell className="text-right">
-                          ${contract.value.toLocaleString()}
+                          ${(contract.value || 0).toLocaleString()}
                         </TableCell>
                         <TableCell className="text-center">
                           <span className={`font-medium ${
-                            contract.slaCompliance >= 98 ? 'text-green-600' :
-                            contract.slaCompliance >= 95 ? 'text-blue-600' : 'text-orange-600'
+                            (contract.slaCompliance || 0) >= 98 ? 'text-green-600' :
+                            (contract.slaCompliance || 0) >= 95 ? 'text-blue-600' : 'text-orange-600'
                           }`}>
-                            {contract.slaCompliance}%
+                            {contract.slaCompliance || 0}%
                           </span>
                         </TableCell>
                         <TableCell>
-                          <Badge className={getRenewalStatusColor(contract.renewalStatus)}>
-                            {contract.renewalStatus.replace('-', ' ')}
+                          <Badge className={getRenewalStatusColor(contract.renewalStatus || 'manual')}>
+                            {(contract.renewalStatus || 'manual').replace('-', ' ')}
                           </Badge>
                         </TableCell>
                       </TableRow>

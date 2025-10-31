@@ -184,56 +184,60 @@ class DataGenerator:
         return contracts
     
     def update_data_realtime(self, data_type: str, existing_data: List):
-        """Simulate real-time changes to existing data with larger ranges"""
+        """Simulate realistic real-time changes to existing data"""
         if not existing_data:
             return existing_data
         
-        # Update MORE items (30-60% of data for more frequent changes)
-        update_count = max(1, int(len(existing_data) * random.uniform(0.3, 0.6)))
+        # Update fewer items (5-15% of data for realistic changes)
+        update_count = max(1, int(len(existing_data) * random.uniform(0.05, 0.15)))
         items_to_update = random.sample(existing_data, update_count)
         
         for item in items_to_update:
             if data_type == "clients":
-                # BIGGER revenue/cost fluctuations (5-50% range)
-                revenue_change = random.uniform(0.85, 1.15)  # ±15% instead of ±5%
-                item.annualRevenue *= revenue_change
-                item.annualCosts *= random.uniform(0.85, 1.15)
-                item.monthlyRecurring = item.annualRevenue / 12
+                # Small, realistic revenue/cost fluctuations (±2-5%)
+                revenue_change = random.uniform(0.98, 1.05)
+                item.annualRevenue = round(item.annualRevenue * revenue_change, 2)
+                # Costs should stay proportional to revenue (60-80%)
+                cost_ratio = random.uniform(0.6, 0.8)
+                item.annualCosts = round(item.annualRevenue * cost_ratio, 2)
+                item.monthlyRecurring = round(item.annualRevenue / 12, 2)
                 
-                # MORE frequent status changes (30% chance instead of 10%)
-                if random.random() < 0.3:
-                    item.status = random.choice(["Active", "Active", "At Risk"])
-                    item.churnRisk = random.choice(["Low", "Medium", "High"])
+                # Rare status changes (5% chance)
+                if random.random() < 0.05:
+                    # Maintain mostly active clients
+                    item.status = random.choice(["Active", "Active", "Active", "Active", "At Risk"])
+                    item.churnRisk = random.choice(["Low", "Low", "Low", "Medium", "High"])
                     
             elif data_type == "licenses":
-                # BIGGER license usage changes (50-100 range)
-                change = random.randint(-15, 25)  # Bigger swings
+                # Small license usage changes (±1-5 licenses)
+                change = random.randint(-2, 5)
                 item.usedLicenses = max(0, min(item.totalLicenses, item.usedLicenses + change))
                 item.availableLicenses = item.totalLicenses - item.usedLicenses
                 item.utilizationRate = round((item.usedLicenses / item.totalLicenses) * 100, 2)
                 
             elif data_type == "leads":
-                # MORE frequent lead progression (40% chance)
-                if random.random() < 0.4:
+                # Occasional lead progression (10% chance)
+                if random.random() < 0.1:
                     stages = ["Prospecting", "Qualification", "Proposal", "Negotiation", "Closed Won"]
                     current_idx = stages.index(item.stage) if item.stage in stages else 0
                     if current_idx < len(stages) - 1:
                         item.stage = stages[current_idx + 1]
-                        # BIGGER probability jumps (100-1000 range for values)
-                        item.probability = min(100, item.probability + random.randint(10, 30))
-                        # Increase deal value as it progresses
-                        item.value *= random.uniform(1.0, 1.2)
+                        # Realistic probability increases (5-15%)
+                        item.probability = min(100, item.probability + random.randint(5, 15))
+                        # Small value adjustments (±5%)
+                        item.value = round(item.value * random.uniform(0.95, 1.05), 2)
                         
             elif data_type == "technicians":
-                # BIGGER utilization changes
-                item.billableHours = random.randint(60, 160)  # Wider range
+                # Small utilization changes (±5-10 hours)
+                change = random.randint(-5, 10)
+                item.billableHours = max(0, min(item.totalHours, item.billableHours + change))
                 item.utilization = round((item.billableHours / item.totalHours) * 100, 2)
                 
             elif data_type == "departments":
-                # BIGGER spending increases
-                spend_increase = item.budget * random.uniform(0.02, 0.08)  # 2-8% instead of 1-5%
-                item.spent = min(item.budget, item.spent + spend_increase)
-                item.remaining = item.budget - item.spent
+                # Small spending increases (0.5-2% of budget)
+                spend_increase = item.budget * random.uniform(0.005, 0.02)
+                item.spent = round(min(item.budget, item.spent + spend_increase), 2)
+                item.remaining = round(item.budget - item.spent, 2)
                 
             item.lastUpdated = datetime.now().isoformat()
         

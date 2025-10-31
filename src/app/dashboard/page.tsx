@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { TopNavbar } from '@/components/dashboard/top-navbar';
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { AgentSummaryCard } from '@/components/dashboard/agent-summary-card';
 import { SkeletonCard, SkeletonDashboard } from '@/components/ui/skeleton';
@@ -41,14 +41,55 @@ export default function DashboardPage() {
           apiClient.getDepartments(),
           apiClient.getVendors(),
         ]);
-        setClients(clientsData);
-        setLicenses(licensesData);
-        setLeads(leadsData);
-        setTechnicians(techniciansData);
-        setDepartments(departmentsData);
-        setVendors(vendorsData);
+        
+        // Sanitize and normalize data
+        setClients((clientsData || []).map((c: any) => ({
+          ...c,
+          monthlyRevenue: c.monthlyRevenue || c.monthlyRecurring || 0,
+          monthlyCosts: c.monthlyCosts || (c.annualCosts ? c.annualCosts / 12 : 0),
+          marginPercentage: c.marginPercentage || 0,
+        })));
+        
+        setLicenses((licensesData || []).map((l: any) => ({
+          ...l,
+          quantity: l.quantity || l.totalLicenses || 0,
+          utilizationRate: l.utilizationRate || 0,
+          potentialSavings: l.potentialSavings || 0,
+        })));
+        
+        setLeads((leadsData || []).map((l: any) => ({
+          ...l,
+          estimatedValue: l.estimatedValue || l.value || 0,
+          conversionProbability: l.conversionProbability || l.probability || 0,
+        })));
+        
+        setTechnicians((techniciansData || []).map((t: any) => ({
+          ...t,
+          utilization: t.utilization || 0,
+          billableHours: t.billableHours || 0,
+        })));
+        
+        setDepartments((departmentsData || []).map((d: any) => ({
+          ...d,
+          actualSpend: d.actualSpend || d.spent || 0,
+          monthlyBudget: d.monthlyBudget || d.budget || 0,
+        })));
+        
+        setVendors((vendorsData || []).map((v: any) => ({
+          ...v,
+          annualValue: v.annualValue || v.contractValue || v.totalSpend || 0,
+          performanceScore: v.performanceScore || 0,
+          status: v.status || 'active',
+        })));
       } catch (error) {
         console.error('Error fetching data:', error);
+        // Set empty arrays on error
+        setClients([]);
+        setLicenses([]);
+        setLeads([]);
+        setTechnicians([]);
+        setDepartments([]);
+        setVendors([]);
       } finally {
         setIsLoading(false);
       }
@@ -56,31 +97,37 @@ export default function DashboardPage() {
     fetchData();
   }, []);
 
-  // Calculate real metrics from data
+  // Calculate real metrics from data with safety checks
   const totalClients = clients.length;
   const atRiskClients = clients.filter(c => c.status === 'at-risk').length;
-  const totalMRR = clients.reduce((sum, c) => sum + c.monthlyRevenue, 0);
-  const totalCosts = clients.reduce((sum, c) => sum + c.monthlyCosts, 0);
+  const totalMRR = clients.reduce((sum, c) => sum + (c.monthlyRevenue || 0), 0);
+  const totalCosts = clients.reduce((sum, c) => sum + (c.monthlyCosts || 0), 0);
   const overallMargin = totalMRR > 0 ? ((totalMRR - totalCosts) / totalMRR) * 100 : 0;
   
-  const totalLicenses = licenses.reduce((sum, l) => sum + l.quantity, 0);
-  const avgUtilization = licenses.length > 0 ? licenses.reduce((sum, l) => sum + l.utilizationRate, 0) / licenses.length : 0;
-  const potentialSavings = licenses.reduce((sum, l) => sum + l.potentialSavings, 0);
+  const totalLicenses = licenses.reduce((sum, l) => sum + (l.quantity || 0), 0);
+  const avgUtilization = licenses.length > 0 
+    ? licenses.reduce((sum, l) => sum + (l.utilizationRate || 0), 0) / licenses.length 
+    : 0;
+  const potentialSavings = licenses.reduce((sum, l) => sum + (l.potentialSavings || 0), 0);
   
   const activeLeads = leads.length;
-  const pipelineValue = leads.reduce((sum, l) => sum + l.estimatedValue, 0);
-  const avgConversionRate = leads.length > 0 ? leads.reduce((sum, l) => sum + l.conversionProbability, 0) / leads.length : 0;
+  const pipelineValue = leads.reduce((sum, l) => sum + (l.estimatedValue || 0), 0);
+  const avgConversionRate = leads.length > 0 
+    ? leads.reduce((sum, l) => sum + (l.conversionProbability || 0), 0) / leads.length 
+    : 0;
   
-  const avgTechUtilization = technicians.length > 0 ? technicians.reduce((sum, t) => sum + t.utilization, 0) / technicians.length : 0;
-  const totalBillableHours = technicians.reduce((sum, t) => sum + t.billableHours, 0);
+  const avgTechUtilization = technicians.length > 0 
+    ? technicians.reduce((sum, t) => sum + (t.utilization || 0), 0) / technicians.length 
+    : 0;
+  const totalBillableHours = technicians.reduce((sum, t) => sum + (t.billableHours || 0), 0);
   
-  const totalMonthlySpend = departments.reduce((sum, d) => sum + d.actualSpend, 0);
-  const totalBudget = departments.reduce((sum, d) => sum + d.monthlyBudget, 0);
+  const totalMonthlySpend = departments.reduce((sum, d) => sum + (d.actualSpend || d.spent || 0), 0);
+  const totalBudget = departments.reduce((sum, d) => sum + (d.monthlyBudget || d.budget || 0), 0);
   const budgetVariance = totalBudget > 0 ? ((totalMonthlySpend - totalBudget) / totalBudget) * 100 : 0;
   
   const activeVendors = vendors.filter(v => v.status === 'active').length;
-  const expiringContracts = vendors.filter(v => v.status === 'expiring-soon').length;
-  const totalAnnualSpend = vendors.reduce((sum, v) => sum + v.annualValue, 0);
+  const expiringContracts = vendors.filter(v => v.status === 'expiring-soon' || v.status === 'expiring').length;
+  const totalAnnualSpend = vendors.reduce((sum, v) => sum + (v.annualValue || v.contractValue || v.totalSpend || 0), 0);
 
   const agentMetrics: Record<string, Metric[]> = {
     'client-profitability': [
@@ -115,14 +162,14 @@ export default function DashboardPage() {
     ],
   };
 
-  // Chart data for each agent (sparklines showing trends)
+  // Chart data for each agent (sparklines showing trends) with safety checks
   const agentChartData: Record<string, number[]> = {
-    'client-profitability': clients.map(c => c.marginPercentage),
-    'software-license': licenses.map(l => l.utilizationRate),
-    'sales-pipeline': leads.map(l => l.conversionProbability),
-    'resource-allocation': technicians.map(t => t.utilization),
-    'departmental-spend': departments.map(d => d.actualSpend / 1000), // Scale down for better visualization
-    'vendor-management': vendors.slice(0, 8).map(v => v.performanceScore),
+    'client-profitability': clients.map(c => c.marginPercentage || 0).filter(v => !isNaN(v)),
+    'software-license': licenses.map(l => l.utilizationRate || 0).filter(v => !isNaN(v)),
+    'sales-pipeline': leads.map(l => l.conversionProbability || 0).filter(v => !isNaN(v)),
+    'resource-allocation': technicians.map(t => t.utilization || 0).filter(v => !isNaN(v)),
+    'departmental-spend': departments.map(d => (d.actualSpend || d.spent || 0) / 1000).filter(v => !isNaN(v)), // Scale down for better visualization
+    'vendor-management': vendors.slice(0, 8).map(v => v.performanceScore || 0).filter(v => !isNaN(v)),
   };
 
   const agentChartColors: Record<string, string> = {
@@ -155,10 +202,9 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div>
-        <DashboardHeader
+        <TopNavbar
           title="Master Dashboard"
           description="Unified view of all AI agent insights and recommendations"
-          alerts={[]}
         />
         <div className="p-8">
           <SkeletonDashboard />
@@ -169,10 +215,9 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <DashboardHeader
+      <TopNavbar
         title="Master Dashboard"
         description="Unified view of all AI agent insights and recommendations"
-        alerts={[]}
       />
 
       <div className="p-8">

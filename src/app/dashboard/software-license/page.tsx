@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
+import { TopNavbar } from '@/components/dashboard/top-navbar';
 import { FloatingChat } from '@/components/agent/floating-chat';
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,10 +17,11 @@ import {
 } from '@/components/ui/table';
 import { TableHeaderWithTooltip } from '@/components/ui/table-header-with-tooltip';
 import { Key, DollarSign, TrendingDown, AlertCircle } from 'lucide-react';
-import { simulatorClient } from '@/lib/api/simulator-client';
+import { dataClient } from '@/lib/api/data-client';
 import { cn } from '@/lib/utils';
 import { PieChart } from '@/components/charts/pie-chart';
 import { BarChart } from '@/components/charts/bar-chart';
+import { ZoomableChart } from '@/components/charts/zoomable-chart';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
 
 export default function SoftwareLicensePage() {
@@ -30,22 +31,23 @@ export default function SoftwareLicensePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await simulatorClient.getLicenses();
-        // Transform simulator data to match expected format
-        const transformedData = data.map((license: any) => ({
-          id: license.id,
-          vendor: license.vendor,
-          product: license.product,
-          quantity: license.totalLicenses,
-          utilized: license.usedLicenses,
-          utilizationRate: license.utilizationRate,
-          monthlyCost: license.totalCost / 12,
-          potentialSavings: (license.totalLicenses - license.usedLicenses) * (license.costPerLicense / 12),
-          status: license.utilizationRate >= 90 ? 'optimal' : license.utilizationRate >= 70 ? 'underutilized' : 'overutilized',
+        const data = await dataClient.getLicenses();
+        // Transform simulator data to match expected format with safety checks
+        const transformedData = (data || []).map((license: any) => ({
+          id: license.id || Math.random().toString(),
+          vendor: license.vendor || 'Unknown',
+          product: license.product || 'Unknown',
+          quantity: license.totalLicenses || 0,
+          utilized: license.usedLicenses || 0,
+          utilizationRate: license.utilizationRate || 0,
+          monthlyCost: (license.totalCost || 0) / 12,
+          potentialSavings: ((license.totalLicenses || 0) - (license.usedLicenses || 0)) * ((license.costPerLicense || 0) / 12),
+          status: (license.utilizationRate || 0) >= 90 ? 'optimal' : (license.utilizationRate || 0) >= 70 ? 'underutilized' : 'overutilized',
         }));
         setLicenses(transformedData);
       } catch (error) {
         console.error('Error fetching licenses:', error);
+        setLicenses([]);
       } finally {
         setIsLoading(false);
       }
@@ -78,33 +80,46 @@ export default function SoftwareLicensePage() {
     }
   };
 
-  // Sort licenses by utilization rate (leaderboard style)
-  const sortedLicenses = [...licenses].sort((a, b) => b.utilizationRate - a.utilizationRate);
-
-  const totalLicenses = licenses.reduce((sum, license) => sum + license.quantity, 0);
-  const totalUtilized = licenses.reduce((sum, license) => sum + license.utilized, 0);
-  const avgUtilization = (totalUtilized / totalLicenses) * 100;
-  const totalCost = licenses.reduce((sum, license) => sum + license.monthlyCost, 0);
-  const totalSavings = licenses.reduce((sum, license) => sum + license.potentialSavings, 0);
-
-  // Prepare data for license distribution pie chart
-  const licenseDistributionData = licenses.map(license => ({
-    name: license.vendor,
-    value: license.quantity,
-  }));
-
-  // Prepare data for utilization rate bar chart
-  const utilizationData = licenses.map(license => ({
-    name: license.product,
-    utilizationRate: license.utilizationRate,
-  }));
-
   // Define colors for utilization based on rate
   const getUtilizationColor = (rate: number) => {
-    if (rate >= 90) return 'hsl(142, 76%, 36%)'; // Green for high utilization
-    if (rate >= 70) return 'hsl(48, 96%, 53%)'; // Yellow for medium utilization
-    return 'hsl(0, 84%, 60%)'; // Red for low utilization
+    if (rate >= 90) return '#22c55e'; // Green for high utilization
+    if (rate >= 70) return '#eab308'; // Yellow for medium utilization
+    return '#ef4444'; // Red for low utilization
   };
+
+  // Sort licenses by utilization rate (leaderboard style)
+  const sortedLicenses = [...licenses].sort((a, b) => (b.utilizationRate || 0) - (a.utilizationRate || 0));
+
+  const totalLicenses = licenses.reduce((sum, license) => sum + (license.quantity || 0), 0);
+  const totalUtilized = licenses.reduce((sum, license) => sum + (license.utilized || 0), 0);
+  const avgUtilization = totalLicenses > 0 ? (totalUtilized / totalLicenses) * 100 : 0;
+  const totalCost = licenses.reduce((sum, license) => sum + (license.monthlyCost || 0), 0);
+  const totalSavings = licenses.reduce((sum, license) => sum + (license.potentialSavings || 0), 0);
+
+  // Prepare data for license distribution pie chart - group by vendor and limit to top 6
+  const vendorGroups = licenses.reduce((acc: any, license) => {
+    const vendor = license.vendor || 'Unknown';
+    if (!acc[vendor]) {
+      acc[vendor] = 0;
+    }
+    acc[vendor] += license.quantity || 0;
+    return acc;
+  }, {});
+
+  const licenseDistributionData = Object.entries(vendorGroups)
+    .map(([name, value]) => ({ name, value: value as number }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 6); // Limit to top 6 vendors
+
+  // Prepare data for utilization rate bar chart - limit to top 10
+  const utilizationData = licenses
+    .map(license => ({
+      name: (license.product || 'Unknown').substring(0, 15), // Shorten names
+      utilizationRate: license.utilizationRate || 0,
+      fill: getUtilizationColor(license.utilizationRate || 0),
+    }))
+    .sort((a, b) => b.utilizationRate - a.utilizationRate)
+    .slice(0, 10); // Limit to top 10
 
   const breadcrumbItems = [
     { label: 'Dashboard', href: '/dashboard' },
@@ -114,13 +129,11 @@ export default function SoftwareLicensePage() {
   if (isLoading) {
     return (
       <div>
-        <DashboardHeader
+        <TopNavbar
           title="Software License Intelligence"
           description="Monitor license usage and identify cost-saving opportunities"
-          alerts={[]}
         />
         <div className="p-8">
-          <Breadcrumb items={breadcrumbItems} className="mb-6" />
           <SkeletonDashboard />
         </div>
       </div>
@@ -129,14 +142,12 @@ export default function SoftwareLicensePage() {
 
   return (
     <div>
-      <DashboardHeader
+      <TopNavbar
         title="Software License Intelligence"
         description="Monitor license usage and identify cost-saving opportunities"
-        alerts={[]}
       />
 
       <div className="p-8">
-        <Breadcrumb items={breadcrumbItems} className="mb-6" />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <MetricCard
             label="Total Licenses"
@@ -177,30 +188,33 @@ export default function SoftwareLicensePage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>License Distribution by Vendor</CardTitle>
+              <CardTitle>License Distribution by Vendor (Top 6)</CardTitle>
             </CardHeader>
             <CardContent>
-              <PieChart
-                data={licenseDistributionData}
-                height={300}
-                showLegend={true}
-              />
+              <ZoomableChart title="License Distribution by Vendor - Detailed View">
+                <PieChart
+                  data={licenseDistributionData}
+                  height={300}
+                  showLegend={true}
+                />
+              </ZoomableChart>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Utilization Rate by License Type</CardTitle>
+              <CardTitle>Utilization Rate by License Type (Top 10)</CardTitle>
             </CardHeader>
             <CardContent>
-              <BarChart
-                data={utilizationData}
-                dataKeys={['utilizationRate']}
-                xAxisKey="name"
-                height={300}
-                colors={utilizationData.map(item => getUtilizationColor(item.utilizationRate))}
-                yAxisLabel="Utilization Rate (%)"
-              />
+              <ZoomableChart title="Utilization Rate by License Type - Detailed View">
+                <BarChart
+                  data={utilizationData}
+                  dataKeys={['utilizationRate']}
+                  xAxisKey="name"
+                  height={300}
+                  yAxisLabel="Utilization Rate (%)"
+                />
+              </ZoomableChart>
             </CardContent>
           </Card>
         </div>
