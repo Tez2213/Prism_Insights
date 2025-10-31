@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DashboardHeader } from '@/components/dashboard/dashboard-header';
 import { FloatingChat } from '@/components/agent/floating-chat';
 import { ClientDetailModal } from '@/components/agent/client-detail-modal';
+import { PageHeader } from '@/components/dashboard/page-header';
 import { MetricCard } from '@/components/dashboard/metric-card';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -139,30 +139,24 @@ export default function ClientProfitabilityPage() {
 
   if (isLoading) {
     return (
-      <div>
-        <DashboardHeader
+      <div className="p-8">
+        <Breadcrumb items={breadcrumbItems} className="mb-6" />
+        <PageHeader 
           title="Client Profitability Intelligence"
           description="Real-time profitability analysis and optimization"
-          alerts={[]}
         />
-        <div className="p-8">
-          <Breadcrumb items={breadcrumbItems} className="mb-6" />
-          <SkeletonDashboard />
-        </div>
+        <SkeletonDashboard />
       </div>
     );
   }
 
   return (
-    <div>
-      <DashboardHeader
+    <div className="p-8">
+      <Breadcrumb items={breadcrumbItems} className="mb-6" />
+      <PageHeader 
         title="Client Profitability Intelligence"
         description="Real-time profitability analysis and optimization"
-        alerts={[]}
       />
-
-      <div className="p-8">
-        <Breadcrumb items={breadcrumbItems} className="mb-6" />
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
           <MetricCard
             label="Total MRR"
@@ -341,7 +335,6 @@ export default function ClientProfitabilityPage() {
         />
 
         <FloatingChat agentName="Client Profitability Intelligence" agentType="client-profitability" />
-      </div>
     </div>
   );
 }

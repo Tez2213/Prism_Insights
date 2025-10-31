@@ -2,69 +2,110 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, TrendingUp, DollarSign, Users } from 'lucide-react';
+import { ArrowRight, TrendingUp, DollarSign, Users, Sparkles, Zap, Target } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-blue-50 to-white py-20 sm:py-32">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            AI-Powered Business Intelligence for{' '}
-            <span className="text-blue-600">MSPs</span>
-          </h1>
-          <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
-            Transform your MSP operations with six collaborative AI agents that
-            analyze profitability, optimize costs, and drive sustainable growth.
-            Real-time insights, automated recommendations, and predictive analytics.
-          </p>
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pt-32 pb-20 sm:pt-40 sm:pb-32">
+      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-5xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-purple-200 shadow-lg mb-8"
+          >
+            <Sparkles className="w-4 h-4 text-purple-600" />
+            <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              SuperOps Hackathon 2025 - Round 2 Prototype
+            </span>
+          </motion.div>
 
-          <div className="mt-10 flex items-center justify-center gap-6">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-5xl font-bold tracking-tight text-gray-900 sm:text-7xl leading-tight"
+          >
+            AI-Powered Intelligence for{' '}
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Modern MSPs
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-8 text-xl leading-8 text-gray-700 max-w-3xl mx-auto"
+          >
+            Six collaborative AI agents working in harmony to optimize profitability, 
+            reduce costs, and drive sustainable growth. Real-time insights powered by AWS Bedrock.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-12 flex items-center justify-center gap-4 flex-wrap"
+          >
             <Link href="/dashboard">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 h-12 px-8">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 h-14 px-8 text-lg group"
+              >
                 View Live Demo
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-          </div>
+          </motion.div>
 
-          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
-            <div className="flex flex-col items-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100">
-                <TrendingUp className="h-6 w-6 text-green-600" />
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-20 grid grid-cols-1 gap-6 sm:grid-cols-3 max-w-4xl mx-auto"
+          >
+            <div className="relative group">
+              <div className="relative bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl">
+                    <TrendingUp className="h-8 w-8 text-green-600" />
+                  </div>
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">15-25%</h3>
+                <p className="text-sm font-medium text-gray-600">Revenue Growth</p>
+                <p className="text-xs text-gray-500 mt-2">Identify upsell opportunities</p>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                15-25% Revenue Growth
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">
-                Identify upsell opportunities and optimize pricing
-              </p>
             </div>
 
-            <div className="flex flex-col items-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-                <DollarSign className="h-6 w-6 text-blue-600" />
+            <div className="relative group">
+              <div className="relative bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-xl">
+                    <DollarSign className="h-8 w-8 text-blue-600" />
+                  </div>
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">20-30%</h3>
+                <p className="text-sm font-medium text-gray-600">Cost Reduction</p>
+                <p className="text-xs text-gray-500 mt-2">Eliminate waste & optimize</p>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                20-30% Cost Reduction
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">
-                Eliminate waste and optimize resource allocation
-              </p>
             </div>
 
-            <div className="flex flex-col items-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100">
-                <Users className="h-6 w-6 text-purple-600" />
+            <div className="relative group">
+              <div className="relative bg-white/80 backdrop-blur-sm p-8 rounded-2xl border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="flex justify-center mb-4">
+                  <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
+                    <Target className="h-8 w-8 text-purple-600" />
+                  </div>
+                </div>
+                <h3 className="text-3xl font-bold text-gray-900 mb-2">Real-Time</h3>
+                <p className="text-sm font-medium text-gray-600">AI Intelligence</p>
+                <p className="text-xs text-gray-500 mt-2">Continuous monitoring 24/7</p>
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                Real-Time Intelligence
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">
-                Continuous monitoring and proactive recommendations
-              </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

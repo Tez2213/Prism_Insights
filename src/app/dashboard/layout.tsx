@@ -1,21 +1,20 @@
 'use client';
 
-import { Sidebar } from '@/components/dashboard/sidebar';
-import { PageTransition } from '@/components/ui/page-transition';
+import { useAlertMonitor } from '@/hooks/useAlertMonitor';
+import { DashboardNav } from '@/components/dashboard/dashboard-nav';
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.Node;
 }) {
+  // Monitor for alerts across all dashboard pages
+  useAlertMonitor();
+
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <PageTransition>
-          {children}
-        </PageTransition>
-      </main>
+    <div className="min-h-screen bg-gray-50">
+      <DashboardNav />
+      <main>{children}</main>
     </div>
   );
 }
