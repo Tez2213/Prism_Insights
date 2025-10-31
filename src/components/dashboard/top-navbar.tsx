@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -8,16 +9,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Bell, Download, AlertCircle, TrendingUp, Users } from 'lucide-react';
+import { Bell, Download, AlertCircle, TrendingUp, Users, Loader2 } from 'lucide-react';
 import { useAlertStore } from '@/lib/stores/alertStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { reportGenerator, type ReportData } from '@/lib/reports/report-generator';
+import { toast } from 'sonner';
 
 interface TopNavbarProps {
   title: string;
   description?: string;
+  onDownloadReport?: () => Promise<ReportData> | ReportData;
 }
 
-export function TopNavbar({ title, description }: TopNavbarProps) {
+export function TopNavbar({ title, description, onDownloadReport }: TopNavbarProps) {
+  const [isGenerating, setIsGenerating] = useState(false);
   const alerts = useAlertStore((state) => state.alerts);
   const unreadCount = useAlertStore((state) => state.unreadCount());
   const markAsRead = useAlertStore((state) => state.markAsRead);
@@ -48,9 +53,43 @@ export function TopNavbar({ title, description }: TopNavbarProps) {
     }
   };
 
-  const handleDownloadReport = () => {
-    // TODO: Implement report download functionality
-    console.log('Downloading report for:', title);
+  const handleDownloadReport = async () => {
+    if (!onDownloadReport) {
+      toast.error('Report generation not configured for this page');
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+      toast.info('Generating professional PDF report...', {
+        description: 'AI is analyzing your data and creating charts',
+      });
+
+      // Get report data from the page
+      const reportData = await onDownloadReport();
+
+      // Generate report with AI insights
+      const reportBlob = await reportGenerator.generateReport(reportData);
+
+      // Determine file extension
+      const isPDF = reportBlob.type === 'application/pdf';
+      const extension = isPDF ? 'pdf' : 'html';
+      const filename = `${reportData.pageTitle.replace(/\s+/g, '_')}_Report_${new Date().toISOString().split('T')[0]}.${extension}`;
+      
+      // Download the report
+      reportGenerator.downloadReport(reportBlob, filename);
+
+      toast.success(`${isPDF ? 'PDF' : 'HTML'} report downloaded successfully!`, {
+        description: isPDF ? 'Professional PDF with charts and AI insights' : 'Open the HTML file in your browser to view',
+      });
+    } catch (error) {
+      console.error('Error generating report:', error);
+      toast.error('Failed to generate report', {
+        description: error instanceof Error ? error.message : 'Please try again or contact support',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -72,10 +111,17 @@ export function TopNavbar({ title, description }: TopNavbarProps) {
               variant="outline"
               size="default"
               onClick={handleDownloadReport}
+              disabled={isGenerating || !onDownloadReport}
               className="gap-2 hover:bg-gray-50"
             >
-              <Download className="h-4 w-4" />
-              <span className="hidden sm:inline">Download Report</span>
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              <span className="hidden sm:inline">
+                {isGenerating ? 'Generating...' : 'Download Report'}
+              </span>
             </Button>
 
             {/* Notifications */}

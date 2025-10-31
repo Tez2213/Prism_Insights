@@ -23,6 +23,7 @@ import { ZoomableChart } from '@/components/charts/zoomable-chart';
 import { TrendingUp, DollarSign, Users, AlertTriangle } from 'lucide-react';
 import { dataClient } from '@/lib/api/data-client';
 import type { Client } from '@/types';
+import type { ReportData } from '@/lib/reports/report-generator';
 
 export default function ClientProfitabilityPage() {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -126,6 +127,35 @@ export default function ClientProfitabilityPage() {
   const avgMargin = ((totalRevenue - totalCosts) / totalRevenue) * 100;
   const atRiskClients = clients.filter((c) => c.status === 'at-risk').length;
 
+  // Report generation function
+  const generateReportData = (): ReportData => {
+    return {
+      pageTitle: 'Client Profitability Intelligence',
+      pageType: 'client-profitability',
+      data: clients,
+      metrics: [
+        { label: 'Total Monthly Recurring Revenue', value: `$${totalRevenue.toLocaleString()}` },
+        { label: 'Average Profit Margin', value: `${avgMargin.toFixed(1)}%` },
+        { label: 'Total Active Clients', value: clients.length },
+        { label: 'At-Risk Clients', value: atRiskClients },
+        { label: 'Total Monthly Costs', value: `$${totalCosts.toLocaleString()}` },
+        { label: 'Net Profit', value: `$${(totalRevenue - totalCosts).toLocaleString()}` },
+      ],
+      charts: [
+        {
+          title: 'Client Profitability Trends',
+          type: 'line',
+          data: sortedClients.slice(0, 10),
+        },
+        {
+          title: 'Top Clients by Revenue',
+          type: 'bar',
+          data: sortedClients.slice(0, 10),
+        },
+      ],
+    };
+  };
+
   // Generate historical profitability data for line chart using top 4 clients
   const topClients = sortedClients.slice(0, 4);
   const profitabilityTrendData = [
@@ -172,6 +202,7 @@ export default function ClientProfitabilityPage() {
       <TopNavbar 
         title="Client Profitability Intelligence"
         description="Real-time profitability analysis and optimization"
+        onDownloadReport={generateReportData}
       />
       <div className="p-8">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">

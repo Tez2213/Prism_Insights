@@ -3,6 +3,7 @@
 import { useAlertMonitor } from '@/hooks/useAlertMonitor';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { SidebarProvider, useSidebar } from '@/lib/contexts/sidebar-context';
+import { ClientProvider } from '@/lib/contexts/client-context';
 
 function DashboardContent({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebar();
@@ -30,9 +31,11 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-gray-50">
-        <DashboardContent>{children}</DashboardContent>
-      </div>
+      <ClientProvider>
+        <div className="min-h-screen bg-gray-50">
+          <DashboardContent>{children}</DashboardContent>
+        </div>
+      </ClientProvider>
     </SidebarProvider>
   );
 }

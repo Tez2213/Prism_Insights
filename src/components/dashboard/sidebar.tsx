@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSidebar } from '@/lib/contexts/sidebar-context';
+import { ClientSelector } from './client-selector';
+import { ClientSelectorSimple } from './client-selector-simple';
 
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: Home, color: 'text-gray-600' },
@@ -100,6 +102,11 @@ export function Sidebar() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Client Selector */}
+      <div className="border-b border-gray-200 py-4">
+        <ClientSelectorSimple collapsed={collapsed} />
       </div>
 
       {/* Navigation */}

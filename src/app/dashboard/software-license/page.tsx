@@ -23,6 +23,7 @@ import { PieChart } from '@/components/charts/pie-chart';
 import { BarChart } from '@/components/charts/bar-chart';
 import { ZoomableChart } from '@/components/charts/zoomable-chart';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import type { ReportData } from '@/lib/reports/report-generator';
 
 export default function SoftwareLicensePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -95,6 +96,36 @@ export default function SoftwareLicensePage() {
   const avgUtilization = totalLicenses > 0 ? (totalUtilized / totalLicenses) * 100 : 0;
   const totalCost = licenses.reduce((sum, license) => sum + (license.monthlyCost || 0), 0);
   const totalSavings = licenses.reduce((sum, license) => sum + (license.potentialSavings || 0), 0);
+  const underutilized = licenses.filter(l => (l.utilizationRate || 0) < 50).length;
+
+  // Report generation function
+  const generateReportData = (): ReportData => {
+    return {
+      pageTitle: 'Software License Intelligence',
+      pageType: 'software-license',
+      data: licenses,
+      metrics: [
+        { label: 'Total Software Licenses', value: totalLicenses },
+        { label: 'Average Utilization Rate', value: `${avgUtilization.toFixed(1)}%` },
+        { label: 'Total Monthly Cost', value: `$${totalCost.toLocaleString()}` },
+        { label: 'Potential Monthly Savings', value: `$${totalSavings.toLocaleString()}` },
+        { label: 'Underutilized Licenses', value: underutilized },
+        { label: 'Total Utilized', value: totalUtilized },
+      ],
+      charts: [
+        {
+          title: 'License Distribution by Vendor',
+          type: 'pie',
+          data: licenseDistributionData,
+        },
+        {
+          title: 'Top 10 Licenses by Utilization Rate',
+          type: 'bar',
+          data: utilizationData,
+        },
+      ],
+    };
+  };
 
   // Prepare data for license distribution pie chart - group by vendor and limit to top 6
   const vendorGroups = licenses.reduce((acc: any, license) => {
@@ -145,6 +176,7 @@ export default function SoftwareLicensePage() {
       <TopNavbar
         title="Software License Intelligence"
         description="Monitor license usage and identify cost-saving opportunities"
+        onDownloadReport={generateReportData}
       />
 
       <div className="p-8">

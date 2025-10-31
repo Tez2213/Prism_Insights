@@ -23,6 +23,7 @@ import { BarChart } from '@/components/charts/bar-chart';
 import { LineChart } from '@/components/charts/line-chart';
 import { ZoomableChart } from '@/components/charts/zoomable-chart';
 import { Breadcrumb } from '@/components/ui/breadcrumb';
+import type { ReportData } from '@/lib/reports/report-generator';
 
 export default function SalesPipelinePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -107,6 +108,37 @@ export default function SalesPipelinePage() {
     ? leads.reduce((sum, lead) => sum + (lead.conversionProbability || 0), 0) / leads.length 
     : 0;
   const qualifiedLeads = leads.filter((l) => l.status !== 'new' && l.status !== 'prospecting').length;
+  const closedWon = leads.filter(l => l.status === 'closed-won').length;
+  const conversionRate = leads.length > 0 ? (closedWon / leads.length * 100) : 0;
+
+  // Report generation function
+  const generateReportData = (): ReportData => {
+    return {
+      pageTitle: 'Sales Pipeline Optimization',
+      pageType: 'sales-pipeline',
+      data: leads,
+      metrics: [
+        { label: 'Total Pipeline Value', value: `$${totalValue.toLocaleString()}` },
+        { label: 'Total Active Leads', value: leads.length },
+        { label: 'Average AI Score', value: avgScore.toFixed(1) },
+        { label: 'Conversion Rate', value: `${conversionRate.toFixed(1)}%` },
+        { label: 'Qualified Leads', value: qualifiedLeads },
+        { label: 'Closed Won', value: closedWon },
+      ],
+      charts: [
+        {
+          title: 'Pipeline Funnel by Stage',
+          type: 'bar',
+          data: pipelineWithConversion.map(s => ({ name: s.stage, value: s.count })),
+        },
+        {
+          title: 'Top 10 Opportunities by Value',
+          type: 'bar',
+          data: sortedLeads.slice(0, 10).map(l => ({ name: l.companyName, value: l.estimatedValue })),
+        },
+      ],
+    };
+  };
 
   // Pipeline funnel data with safety checks
   const pipelineStages = [
@@ -177,6 +209,7 @@ export default function SalesPipelinePage() {
       <TopNavbar
         title="Sales Pipeline Optimization"
         description="AI-powered lead scoring and pipeline management"
+        onDownloadReport={generateReportData}
       />
 
       <div className="p-8">
