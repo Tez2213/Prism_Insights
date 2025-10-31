@@ -355,36 +355,42 @@ class ReportGenerator {
    * Generate downloadable report
    */
   async generateReport(reportData: ReportData): Promise<Blob> {
-    try {
-      // Get AI insights first
-      const insights = await this.generateAIInsights(reportData);
-      
-      // Call Python server to generate professional PDF
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SIMULATOR_URL}/api/generate-report`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...reportData,
-          insights,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF report');
-      }
-
-      // Get PDF blob
-      const blob = await response.blob();
-      return blob;
-    } catch (error) {
-      console.error('Error generating PDF report:', error);
-      // Fallback to HTML report
-      const insights = await this.generateAIInsights(reportData);
-      const html = this.generateHTMLReport(reportData, insights);
-      return new Blob([html], { type: 'text/html' });
+    // Check if simulator URL is configured
+    const simulatorUrl = process.env.NEXT_PUBLIC_SIMULATOR_URL;
+    
+    if (!simulatorUrl) {
+      throw new Error('Report server not configured. Please contact administrator.');
     }
+
+    // Get AI insights first
+    const insights = await this.generateAIInsights(reportData);
+    
+    // Call Python server to generate professional PDF
+    const response = await fetch(`${simulatorUrl}/api/generate-report`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...reportData,
+        insights,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new Error(`Report generation failed: ${errorText}`);
+    }
+
+    // Get PDF blob
+    const blob = await response.blob();
+    
+    // Verify it's actually a PDF
+    if (blob.type !== 'application/pdf') {
+      throw new Error('Server returned invalid PDF file');
+    }
+    
+    return blob;
   }
 
   /**
