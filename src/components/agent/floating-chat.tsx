@@ -70,7 +70,7 @@ export function FloatingChat({ agentName, agentType = 'client-profitability' }: 
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: 'agent',
-        content: 'Sorry, I encountered an error processing your request. Please try again.',
+        content: 'SSO credentials may have expired. Please contact the developer.',
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMessage]);

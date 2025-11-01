@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prism Insights - Hackathon Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            scroll-snap-align: start;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid #667eea30;
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: white;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.5;
+        }
+
+        .nav-dot.active {
+            opacity: 1;
+            transform: scale(1.3);
+        }
+
+        .mermaid {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+        }
+
+        .tech-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .screenshot-container {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .screenshot-container:hover {
+            transform: scale(1.02);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            padding-bottom: 2rem;
+            border-left: 3px solid #667eea;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #667eea;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .comparison-table tr:hover {
+            background: #f9fafb;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Dots -->
+    <div class="nav-dots">
+        <div class="nav-dot active" onclick="scrollToSlide(0)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(1)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(2)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(3)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(4)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(5)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(6)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(7)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(8)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(9)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(10)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(11)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(12)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(13)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(14)"></div>
+    </div>
+
+    <!-- Slide 1: Title Slide -->
+    <section class="slide" id="slide-0">
+        <div class="content-card text-center">
+            <div class="mb-8">
+                <i class="fas fa-brain text-8xl gradient-text"></i>
+            </div>
+            <h1 class="text-6xl font-bold gradient-text mb-4">PRISM INSIGHTS</h1>
+            <h2 class="text-3xl font-semibold text-gray-700 mb-6">AI Agent Ecosystem for MSP Business Optimization</h2>
+            <p class="text-xl text-gray-600 mb-8">Collaborative Intelligence • Real-Time Analytics • Autonomous
+                Optimization</p>
+            <div class="flex justify-center gap-4 mb-8">
+                <div class="stat-card">
+                    <div class="text-4xl font-bold">15-25%</div>
+                    <div class="text-sm mt-2">Revenue Growth</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold">20-30%</div>
+                    <div class="text-sm mt-2">Cost Reduction</div>
+                </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold">6</div>
+                    <div class="text-sm mt-2">AI Agents</div>
+                </div>
+            </div>
+            <p class="text-gray-500">Hackathon Presentation 2025</p>
+        </div>
+    </section>
+
+    <!-- Slide 2: Problem Statement -->
+    <section class="slide" id="slide-1">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-exclamation-triangle mr-3"></i>The Problem
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="feature-card">
+                    <i class="fas fa-chart-line text-3xl text-red-500 mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Siloed Business Intelligence</h3>
+                    <p class="text-gray-600">MSPs use disconnected tools for profitability, licensing, sales, and
+                        resources - no unified view</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-clock text-3xl text-orange-500 mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Reactive Management</h3>
+                    <p class="text-gray-600">Decisions made after problems occur, missing opportunities for proactive
+                        optimization</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-money-bill-wave text-3xl text-yellow-500 mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Hidden Cost Leakage</h3>
+                    <p class="text-gray-600">20-30% of software licenses underutilized, unprofitable clients undetected,
+                        margins eroding</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-brain text-3xl text-purple-500 mb-3"></i>
+                    <h3 class="text-xl font-bold mb-2">Manual Analysis Burden</h3>
+                    <p class="text-gray-600">Hours spent on spreadsheets, reports, and analysis instead of strategic
+                        decision-making</p>
+                </div>
+            </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-lg">
+                <p class="text-lg font-semibold text-red-800">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Result: MSPs lose 15-25% potential revenue and waste 20-30% on unnecessary costs
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Our Solution -->
+    <section class="slide" id="slide-2">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-lightbulb mr-3"></i>Our Solution
+            </h2>
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">AI Agent Ecosystem for Unified Business Intelligence
+                </h3>
+                <p class="text-lg text-gray-600 mb-6">
+                    A revolutionary platform with 6 interconnected AI agents that collaboratively analyze, predict, and
+                    optimize every aspect of MSP operations in real-time.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="feature-card text-center">
+                    <i class="fas fa-users-cog text-4xl text-green-500 mb-3"></i>
+                    <h4 class="font-bold text-lg mb-2">Client Profitability Intelligence</h4>
+                    <p class="text-sm text-gray-600">Analyzes margins, predicts churn, optimizes contracts</p>
+                </div>
+                <div class="feature-card text-center">
+                    <i class="fas fa-key text-4xl text-blue-500 mb-3"></i>
+                    <h4 class="font-bold text-lg mb-2">Software License Intelligence</h4>
+                    <p class="text-sm text-gray-600">Monitors usage, ensures compliance, cuts costs</p>
+                </div>
+                <div class="feature-card text-center">
+                    <i class="fas fa-bullseye text-4xl text-purple-500 mb-3"></i>
+                    <h4 class="font-bold text-lg mb-2">Sales Pipeline Optimization</h4>
+                    <p class="text-sm text-gray-600">Forecasts revenue, identifies opportunities</p>
+                </div>
+                <div class="feature-card text-center">
+                    <i class="fas fa-user-friends text-4xl text-orange-500 mb-3"></i>
+                    <h4 class="font-bold text-lg mb-2">Resource Allocation Optimizer</h4>
+                    <p class="text-sm text-gray-600">Optimizes technician utilization, margins</p>
+                </div>
+                <div class="feature-card text-center">
+                    <i class="fas fa-chart-pie text-4xl text-indigo-500 mb-3"></i>
+                    <h4 class="font-bold text-lg mb-2">Departmental Spend Analytics</h4>
+                    <p class="text-sm text-gray-600">Tracks budgets, identifies waste</p>
+                </div>
+                <div class="feature-card text-center">
+                    <i class="fas fa-handshake text-4xl text-pink-500 mb-3"></i>
+                    <h4 class="font-bold text-lg mb-2">Vendor & Contract Management</h4>
+                    <p class="text-sm text-gray-600">Manages relationships, renewals, negotiations</p>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 p-6 rounded-lg">
+                <h4 class="font-bold text-xl mb-3 text-purple-800">
+                    <i class="fas fa-star mr-2"></i>Key Innovation: Collaborative AI
+                </h4>
+                <p class="text-gray-700">
+                    Unlike isolated tools, our agents share intelligence and work together. When one agent detects an
+                    issue, others automatically analyze related impacts and provide holistic solutions.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: How It's Different (USP) -->
+    <section class="slide" id="slide-3">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-trophy mr-3"></i>What Makes Us Different
+            </h2>
+
+            <table class="comparison-table mb-8">
+                <thead>
+                    <tr>
+                        <th class="text-left">Feature</th>
+                        <th class="text-center">Traditional Tools</th>
+                        <th class="text-center">Prism Insights</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-semibold">Intelligence Type</td>
+                        <td class="text-center">❌ Siloed, isolated analysis</td>
+                        <td class="text-center">✅ Collaborative AI agents</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Decision Making</td>
+                        <td class="text-center">❌ Reactive, after problems occur</td>
+                        <td class="text-center">✅ Proactive, predictive optimization</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Data Integration</td>
+                        <td class="text-center">❌ Manual data entry, exports</td>
+                        <td class="text-center">✅ Real-time unified data layer</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Insights</td>
+                        <td class="text-center">❌ Generic recommendations</td>
+                        <td class="text-center">✅ MSP-specific, contextual AI</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Automation</td>
+                        <td class="text-center">❌ Manual workflows</td>
+                        <td class="text-center">✅ Autonomous optimization</td>
+                    </tr>
+                    <tr>
+                        <td class="font-semibold">Learning</td>
+                        <td class="text-center">❌ Static rules</td>
+                        <td class="text-center">✅ Continuous learning from outcomes</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="stat-card">
+                    <i class="fas fa-network-wired text-4xl mb-3"></i>
+                    <div class="text-3xl font-bold mb-2">Unified</div>
+                    <p class="text-sm">Single platform for all business functions</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-robot text-4xl mb-3"></i>
+                    <div class="text-3xl font-bold mb-2">Autonomous</div>
+                    <p class="text-sm">AI agents work 24/7 without human intervention</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-industry text-4xl mb-3"></i>
+                    <div class="text-3xl font-bold mb-2">MSP-Specific</div>
+                    <p class="text-sm">Built for MSP business models & workflows</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: Key Features -->
+    <section class="slide" id="slide-4">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-list-check mr-3"></i>Key Features
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-chart-line text-3xl text-green-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Real-Time Profitability Analysis</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Client-level margin tracking</li>
+                                <li>• Churn risk prediction (ML-powered)</li>
+                                <li>• Contract optimization recommendations</li>
+                                <li>• Revenue forecasting with 95% accuracy</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-shield-alt text-3xl text-blue-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Intelligent License Management</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Automated usage monitoring</li>
+                                <li>• Compliance risk detection</li>
+                                <li>• Cost optimization (20-30% savings)</li>
+                                <li>• Vendor negotiation intelligence</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-funnel-dollar text-3xl text-purple-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Sales Pipeline Intelligence</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Lead scoring & prioritization</li>
+                                <li>• Deal velocity optimization</li>
+                                <li>• Win probability prediction</li>
+                                <li>• Automated follow-up recommendations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-users-cog text-3xl text-orange-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Resource Optimization</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Technician utilization tracking</li>
+                                <li>• Skill-based assignment</li>
+                                <li>• Margin optimization per project</li>
+                                <li>• Capacity planning automation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-comments text-3xl text-indigo-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Natural Language Interface</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Chat with AI agents in plain English</li>
+                                <li>• Voice command support</li>
+                                <li>• Contextual conversations</li>
+                                <li>• Multi-agent collaboration</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-file-pdf text-3xl text-pink-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Automated Reporting</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Professional PDF reports with AI insights</li>
+                                <li>• Scheduled email delivery</li>
+                                <li>• Executive dashboards</li>
+                                <li>• Custom KPI tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-brain text-3xl text-red-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Continuous Learning</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Learns from business outcomes</li>
+                                <li>• Adapts to company patterns</li>
+                                <li>• Improves predictions over time</li>
+                                <li>• Industry benchmark updates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="flex items-start">
+                        <i class="fas fa-link text-3xl text-teal-500 mr-4 mt-1"></i>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Agent Collaboration</h3>
+                            <ul class="text-gray-600 space-y-1 text-sm">
+                                <li>• Cross-agent intelligence sharing</li>
+                                <li>• Holistic problem solving</li>
+                                <li>• Predictive cascading alerts</li>
+                                <li>• Consensus-based recommendations</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 6: System Architecture -->
+    <section class="slide" id="slide-5">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-sitemap mr-3"></i>System Architecture
+            </h2>
+
+            <div class="mermaid mb-8">
+                graph TB
+                subgraph "Frontend Layer"
+                A[Next.js 15 App]
+                B[React 19 UI]
+                C[Tailwind CSS]
+                D[Recharts Visualization]
+                end
+
+                subgraph "API Gateway"
+                E[Next.js API Routes]
+                F[AWS API Gateway]
+                end
+
+                subgraph "AI Agent Layer"
+                G[AWS Bedrock Agents]
+                H1[Client Profitability Agent]
+                H2[Software License Agent]
+                H3[Sales Pipeline Agent]
+                H4[Resource Allocation Agent]
+                H5[Spend Analytics Agent]
+                H6[Vendor Management Agent]
+                end
+
+                subgraph "Action Layer"
+                I[AWS Lambda Functions]
+                J1[Query Data]
+                J2[Predict Churn]
+                J3[Optimize Costs]
+                J4[Forecast Revenue]
+                end
+
+                subgraph "AI Services"
+                K[Claude 3.5 Sonnet]
+                L[AWS Comprehend]
+                M[AWS Textract]
+                end
+
+                subgraph "Data Layer"
+                N[Amazon DynamoDB]
+                O[Amazon S3]
+                P[Knowledge Base]
+                end
+
+                subgraph "Data Simulator"
+                Q[FastAPI Backend]
+                R[Real-time Data Generator]
+                end
+
+                A --> E
+                B --> E
+                E --> F
+                F --> G
+                G --> H1 & H2 & H3 & H4 & H5 & H6
+                H1 & H2 & H3 --> I
+                I --> J1 & J2 & J3 & J4
+                J1 & J2 & J3 & J4 --> K & L & M
+                K --> N & O & P
+                Q --> R
+                R --> N
+
+                style A fill:#3B82F6,color:#fff
+                style G fill:#9333EA,color:#fff
+                style K fill:#10B981,color:#fff
+                style N fill:#F59E0B,color:#fff
+                style Q fill:#EF4444,color:#fff
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-4">
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <i class="fas fa-desktop text-3xl text-blue-600 mb-2"></i>
+                    <h4 class="font-bold">Frontend</h4>
+                    <p class="text-sm text-gray-600">Next.js 15 + React 19</p>
+                </div>
+                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                    <i class="fas fa-brain text-3xl text-purple-600 mb-2"></i>
+                    <h4 class="font-bold">AI Layer</h4>
+                    <p class="text-sm text-gray-600">AWS Bedrock Agents</p>
+                </div>
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <i class="fas fa-server text-3xl text-green-600 mb-2"></i>
+                    <h4 class="font-bold">Compute</h4>
+                    <p class="text-sm text-gray-600">AWS Lambda</p>
+                </div>
+                <div class="text-center p-4 bg-orange-50 rounded-lg">
+                    <i class="fas fa-database text-3xl text-orange-600 mb-2"></i>
+                    <h4 class="font-bold">Data</h4>
+                    <p class="text-sm text-gray-600">DynamoDB + S3</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 7: AWS Cloud Infrastructure -->
+    <section class="slide" id="slide-6">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fab fa-aws mr-3"></i>AWS Cloud Infrastructure
+            </h2>
+
+            <div class="mermaid mb-8">
+                graph TB
+                subgraph "User Access"
+                U[Users/Browsers]
+                end
+
+                subgraph "AWS Region: us-east-2"
+                subgraph "Compute Services"
+                CF[CloudFront CDN]
+                APIGW[API Gateway]
+                L1[Lambda: Query Data]
+                L2[Lambda: Predict Churn]
+                L3[Lambda: Optimize Costs]
+                L4[Lambda: Analyze Margins]
+                L5[Lambda: Forecast Revenue]
+                end
+
+                subgraph "AI/ML Services"
+                BR[AWS Bedrock]
+                CL[Claude 3.5 Sonnet]
+                CO[AWS Comprehend]
+                TX[AWS Textract]
+                KB[Knowledge Base]
+                end
+
+                subgraph "Storage Services"
+                S3KB[S3: Knowledge Base]
+                S3R[S3: Reports]
+                DDB[DynamoDB Tables]
+                end
+
+                subgraph "Security & Monitoring"
+                IAM[IAM Roles & Policies]
+                CW[CloudWatch Logs]
+                SM[Secrets Manager]
+                end
+
+                subgraph "Infrastructure as Code"
+                CDK[AWS CDK TypeScript]
+                end
+                end
+
+                U --> CF
+                CF --> APIGW
+                APIGW --> L1 & L2 & L3 & L4 & L5
+                L1 & L2 & L3 & L4 & L5 --> BR
+                BR --> CL
+                BR --> KB
+                KB --> S3KB
+                L2 & L3 --> CO
+                L4 --> TX
+                L1 & L2 & L3 & L4 & L5 --> DDB
+                L5 --> S3R
+                IAM --> L1 & L2 & L3 & L4 & L5
+                L1 & L2 & L3 & L4 & L5 --> CW
+                BR --> SM
+                CDK -.Deploy.-> APIGW & L1 & L2 & L3 & L4 & L5 & DDB & S3KB & S3R
+
+                style BR fill:#FF9900,color:#fff
+                style CL fill:#9333EA,color:#fff
+                style DDB fill:#3B82F6,color:#fff
+                style S3KB fill:#10B981,color:#fff
+                style IAM fill:#EF4444,color:#fff
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="feature-card">
+                    <h4 class="font-bold text-lg mb-3 text-orange-600">
+                        <i class="fab fa-aws mr-2"></i>Core Services
+                    </h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• AWS Bedrock (AI Agents)</li>
+                        <li>• Lambda (Serverless Compute)</li>
+                        <li>• DynamoDB (NoSQL Database)</li>
+                        <li>• S3 (Object Storage)</li>
+                        <li>• API Gateway (REST APIs)</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4 class="font-bold text-lg mb-3 text-purple-600">
+                        <i class="fas fa-brain mr-2"></i>AI/ML Services
+                    </h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Claude 3.5 Sonnet (LLM)</li>
+                        <li>• Comprehend (NLP)</li>
+                        <li>• Textract (OCR)</li>
+                        <li>• Knowledge Base (RAG)</li>
+                        <li>• Titan Embeddings</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <h4 class="font-bold text-lg mb-3 text-blue-600">
+                        <i class="fas fa-shield-alt mr-2"></i>Security & Ops
+                    </h4>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• IAM (Access Control)</li>
+                        <li>• CloudWatch (Monitoring)</li>
+                        <li>• Secrets Manager</li>
+                        <li>• VPC (Network Isolation)</li>
+                        <li>• AWS CDK (IaC)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 8: Agent Collaboration Flow -->
+    <section class="slide" id="slide-7">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-project-diagram mr-3"></i>Agent Collaboration Flow
+            </h2>
+
+            <div class="mermaid mb-8">
+                sequenceDiagram
+                participant U as User
+                participant CP as Client Profitability Agent
+                participant SL as Software License Agent
+                participant SP as Sales Pipeline Agent
+                participant RA as Resource Allocation Agent
+                participant DB as DynamoDB
+
+                U->>CP: "Show unprofitable clients"
+                CP->>DB: Query client data
+                DB-->>CP: Client metrics
+                CP->>CP: Analyze margins
+                CP-->>U: "Client ABC has 12% margin (below 20% target)"
+
+                Note over CP,SL: Automatic Collaboration Triggered
+
+                CP->>SL: Check license costs for Client ABC
+                SL->>DB: Query licenses
+                DB-->>SL: License data
+                SL-->>CP: "30% license underutilization detected"
+
+                CP->>RA: Check resource allocation
+                RA->>DB: Query technician hours
+                DB-->>RA: Resource data
+                RA-->>CP: "Technician over-allocation by 15%"
+
+                CP->>SP: Check upsell opportunities
+                SP->>DB: Query pipeline
+                DB-->>SP: Lead data
+                SP-->>CP: "2 expansion opportunities available"
+
+                CP->>CP: Generate holistic recommendation
+                CP-->>U: "Optimize by: 1) Reclaim 10 licenses ($2K/mo)<br />2) Right-size resources (save
+                $3K/mo)<br />3) Upsell managed security ($5K/mo)<br />Net impact: +$10K/mo, margin to 28%"
+
+                U->>CP: "Apply recommendations"
+                CP->>SL: Execute license optimization
+                CP->>RA: Execute resource reallocation
+                CP->>SP: Create upsell tasks
+
+                Note over U,DB: All agents work together for holistic optimization
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 p-6 rounded-lg">
+                <h4 class="font-bold text-xl mb-3 text-purple-800">
+                    <i class="fas fa-magic mr-2"></i>Collaborative Intelligence in Action
+                </h4>
+                <p class="text-gray-700 mb-3">
+                    When one agent identifies an issue, it automatically consults other agents to understand the full
+                    context and provide comprehensive solutions.
+                </p>
+                <div class="grid md:grid-cols-3 gap-4 mt-4">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-purple-600">3-5x</div>
+                        <div class="text-sm text-gray-600">Faster Problem Resolution</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-blue-600">95%</div>
+                        <div class="text-sm text-gray-600">Recommendation Accuracy</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-600">100%</div>
+                        <div class="text-sm text-gray-600">Context Awareness</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 9: Use Case Diagram -->
+    <section class="slide" id="slide-8">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-users mr-3"></i>Use Case Diagram
+            </h2>
+
+            <div class="mermaid mb-8">
+                graph LR
+                CEO[CEO/Owner]
+                CFO[CFO]
+                SM[Sales Manager]
+                TM[Technical Manager]
+                AM[Account Manager]
+
+                subgraph Platform["Prism Insights Platform"]
+                direction LR
+
+                subgraph CP["Client Profitability"]
+                UC1[View Margins]
+                UC2[Predict Churn]
+                UC3[Optimize Contracts]
+                UC4[Generate Reports]
+                end
+
+                subgraph LM["License Management"]
+                UC5[Monitor Usage]
+                UC6[Assess Compliance]
+                UC7[Optimize Costs]
+                UC8[Negotiate Renewals]
+                end
+
+                subgraph SP["Sales Pipeline"]
+                UC9[Score Leads]
+                UC10[Forecast Revenue]
+                UC11[Track Opportunities]
+                UC12[Automate Follow-ups]
+                end
+
+                subgraph RA["Resource Allocation"]
+                UC13[Track Utilization]
+                UC14[Assign Technicians]
+                UC15[Optimize Margins]
+                UC16[Plan Capacity]
+                end
+
+                subgraph SA["Spend Analytics"]
+                UC17[Track Budgets]
+                UC18[Analyze Spending]
+                UC19[Identify Waste]
+                UC20[Forecast Costs]
+                end
+
+                subgraph VM["Vendor Management"]
+                UC21[Manage Contracts]
+                UC22[Track Performance]
+                UC23[Schedule Renewals]
+                UC24[Negotiate Terms]
+                end
+                end
+
+                CEO --> UC1
+                CEO --> UC2
+                CEO --> UC4
+                CEO --> UC10
+                CEO --> UC17
+                CEO --> UC18
+
+                CFO --> UC1
+                CFO --> UC3
+                CFO --> UC7
+                CFO --> UC17
+                CFO --> UC19
+                CFO --> UC20
+
+                SM --> UC9
+                SM --> UC10
+                SM --> UC11
+                SM --> UC12
+
+                TM --> UC13
+                TM --> UC14
+                TM --> UC15
+                TM --> UC16
+
+                AM --> UC1
+                AM --> UC2
+                AM --> UC3
+                AM --> UC21
+                AM --> UC22
+
+                style CEO fill:#3B82F6,color:#fff,stroke:#2563EB,stroke-width:3px
+                style CFO fill:#10B981,color:#fff,stroke:#059669,stroke-width:3px
+                style SM fill:#9333EA,color:#fff,stroke:#7C3AED,stroke-width:3px
+                style TM fill:#F59E0B,color:#fff,stroke:#D97706,stroke-width:3px
+                style AM fill:#EF4444,color:#fff,stroke:#DC2626,stroke-width:3px
+
+                style Platform fill:#F3F4F6,stroke:#667eea,stroke-width:3px
+                style CP fill:#E0E7FF,stroke:#667eea,stroke-width:2px
+                style LM fill:#DBEAFE,stroke:#3B82F6,stroke-width:2px
+                style SP fill:#F3E8FF,stroke:#9333EA,stroke-width:2px
+                style RA fill:#FEF3C7,stroke:#F59E0B,stroke-width:2px
+                style SA fill:#E0E7FF,stroke:#6366F1,stroke-width:2px
+                style VM fill:#FCE7F3,stroke:#EC4899,stroke-width:2px
+            </div>
+
+            <div class="grid md:grid-cols-5 gap-4">
+                <div class="text-center p-3 bg-blue-50 rounded-lg">
+                    <i class="fas fa-user-tie text-2xl text-blue-600 mb-2"></i>
+                    <h5 class="font-bold text-sm">CEO</h5>
+                    <p class="text-xs text-gray-600">Strategic Overview</p>
+                </div>
+                <div class="text-center p-3 bg-green-50 rounded-lg">
+                    <i class="fas fa-calculator text-2xl text-green-600 mb-2"></i>
+                    <h5 class="font-bold text-sm">CFO</h5>
+                    <p class="text-xs text-gray-600">Financial Control</p>
+                </div>
+                <div class="text-center p-3 bg-purple-50 rounded-lg">
+                    <i class="fas fa-chart-line text-2xl text-purple-600 mb-2"></i>
+                    <h5 class="font-bold text-sm">Sales Manager</h5>
+                    <p class="text-xs text-gray-600">Pipeline Optimization</p>
+                </div>
+                <div class="text-center p-3 bg-orange-50 rounded-lg">
+                    <i class="fas fa-tools text-2xl text-orange-600 mb-2"></i>
+                    <h5 class="font-bold text-sm">Tech Manager</h5>
+                    <p class="text-xs text-gray-600">Resource Planning</p>
+                </div>
+                <div class="text-center p-3 bg-red-50 rounded-lg">
+                    <i class="fas fa-handshake text-2xl text-red-600 mb-2"></i>
+                    <h5 class="font-bold text-sm">Account Manager</h5>
+                    <p class="text-xs text-gray-600">Client Success</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 10: Technology Stack -->
+    <section class="slide" id="slide-9">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-code mr-3"></i>Technology Stack
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-600">
+                        <i class="fas fa-desktop mr-2"></i>Frontend
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="tech-badge">Next.js 15.5.5</div>
+                        <div class="tech-badge">React 19.1.0</div>
+                        <div class="tech-badge">TypeScript 5</div>
+                        <div class="tech-badge">Tailwind CSS 4</div>
+                        <div class="tech-badge">Recharts 3</div>
+                        <div class="tech-badge">Framer Motion 12</div>
+                        <div class="tech-badge">Zustand 5</div>
+                        <div class="tech-badge">Radix UI</div>
+                        <div class="tech-badge">Lucide Icons</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-purple-600">
+                        <i class="fas fa-brain mr-2"></i>AI & Backend
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="tech-badge">AWS Bedrock</div>
+                        <div class="tech-badge">Claude 3.5 Sonnet</div>
+                        <div class="tech-badge">AWS Lambda</div>
+                        <div class="tech-badge">FastAPI (Python)</div>
+                        <div class="tech-badge">AWS Comprehend</div>
+                        <div class="tech-badge">AWS Textract</div>
+                        <div class="tech-badge">Pydantic</div>
+                        <div class="tech-badge">Uvicorn</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-green-600">
+                        <i class="fas fa-database mr-2"></i>Data & Storage
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="tech-badge">Amazon DynamoDB</div>
+                        <div class="tech-badge">Amazon S3</div>
+                        <div class="tech-badge">AWS SDK v3</div>
+                        <div class="tech-badge">Boto3</div>
+                        <div class="tech-badge">ReportLab (PDF)</div>
+                        <div class="tech-badge">Matplotlib</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-orange-600">
+                        <i class="fas fa-cloud mr-2"></i>Infrastructure
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="tech-badge">AWS CDK</div>
+                        <div class="tech-badge">CloudFormation</div>
+                        <div class="tech-badge">API Gateway</div>
+                        <div class="tech-badge">CloudWatch</div>
+                        <div class="tech-badge">IAM</div>
+                        <div class="tech-badge">Secrets Manager</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mermaid">
+                graph LR
+                subgraph "Frontend Stack"
+                A[Next.js 15] --> B[React 19]
+                B --> C[TypeScript]
+                C --> D[Tailwind CSS]
+                end
+
+                subgraph "AI Stack"
+                E[AWS Bedrock] --> F[Claude 3.5]
+                E --> G[Comprehend]
+                E --> H[Textract]
+                end
+
+                subgraph "Backend Stack"
+                I[FastAPI] --> J[Lambda]
+                J --> K[DynamoDB]
+                J --> L[S3]
+                end
+
+                subgraph "DevOps Stack"
+                M[AWS CDK] --> N[CloudFormation]
+                N --> O[CloudWatch]
+                end
+
+                A --> I
+                I --> E
+                E --> K
+
+                style A fill:#3B82F6,color:#fff
+                style E fill:#9333EA,color:#fff
+                style I fill:#10B981,color:#fff
+                style M fill:#F59E0B,color:#fff
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 11: Implementation Cost -->
+    <section class="slide" id="slide-10">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-dollar-sign mr-3"></i>Implementation Cost Analysis
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Development Costs</h3>
+                    <table class="w-full">
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">Frontend Development</td>
+                            <td class="py-3 text-right">$15,000</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">AI Agent Development</td>
+                            <td class="py-3 text-right">$25,000</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">Backend & APIs</td>
+                            <td class="py-3 text-right">$12,000</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">Infrastructure Setup</td>
+                            <td class="py-3 text-right">$8,000</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">Testing & QA</td>
+                            <td class="py-3 text-right">$5,000</td>
+                        </tr>
+                        <tr class="border-t-2 border-purple-600">
+                            <td class="py-3 font-bold text-lg">Total Development</td>
+                            <td class="py-3 text-right font-bold text-lg text-purple-600">$65,000</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-4">Monthly Operating Costs</h3>
+                    <table class="w-full">
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">AWS Bedrock (AI)</td>
+                            <td class="py-3 text-right">$30-60</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">Lambda Functions</td>
+                            <td class="py-3 text-right">$10-20</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">DynamoDB</td>
+                            <td class="py-3 text-right">$10-25</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">S3 Storage</td>
+                            <td class="py-3 text-right">$5-10</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">API Gateway</td>
+                            <td class="py-3 text-right">$5-15</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-3 font-semibold">CloudWatch & Monitoring</td>
+                            <td class="py-3 text-right">$5-10</td>
+                        </tr>
+                        <tr class="border-t-2 border-blue-600">
+                            <td class="py-3 font-bold text-lg">Total Monthly</td>
+                            <td class="py-3 text-right font-bold text-lg text-blue-600">$65-140</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="stat-card">
+                    <i class="fas fa-code text-4xl mb-3"></i>
+                    <div class="text-3xl font-bold mb-2">$65K</div>
+                    <p class="text-sm">One-Time Development</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-cloud text-4xl mb-3"></i>
+                    <div class="text-3xl font-bold mb-2">$65-140</div>
+                    <p class="text-sm">Monthly AWS Costs</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line text-4xl mb-3"></i>
+                    <div class="text-3xl font-bold mb-2">$780-1,680</div>
+                    <p class="text-sm">Annual Operating Cost</p>
+                </div>
+            </div>
+
+            <div class="mt-8 bg-green-50 border-l-4 border-green-500 p-6 rounded-lg">
+                <h4 class="font-bold text-xl mb-2 text-green-800">
+                    <i class="fas fa-check-circle mr-2"></i>ROI Analysis
+                </h4>
+                <p class="text-gray-700 mb-3">
+                    For an MSP with $2M annual revenue:
+                </p>
+                <ul class="space-y-2 text-gray-700">
+                    <li><strong>Revenue Increase (15%):</strong> +$300,000/year</li>
+                    <li><strong>Cost Reduction (20%):</strong> +$200,000/year</li>
+                    <li><strong>Total Annual Benefit:</strong> $500,000</li>
+                    <li><strong>Payback Period:</strong> <span class="text-green-600 font-bold">1.5 months</span></li>
+                    <li><strong>5-Year ROI:</strong> <span class="text-green-600 font-bold">3,750%</span></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <!-- Slide 12: Prototype Screenshots -->
+    <section class="slide" id="slide-11">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-images mr-3"></i>Prototype Screenshots
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div class="screenshot-container">
+                    <img src="https://via.placeholder.com/600x400/667eea/ffffff?text=Landing+Page" alt="Landing Page"
+                        class="w-full">
+                    <div class="p-4 bg-gray-50">
+                        <h4 class="font-bold text-lg">Landing Page</h4>
+                        <p class="text-sm text-gray-600">Modern hero section with animated features showcase</p>
+                    </div>
+                </div>
+
+                <div class="screenshot-container">
+                    <img src="https://via.placeholder.com/600x400/764ba2/ffffff?text=Client+Dashboard"
+                        alt="Client Dashboard" class="w-full">
+                    <div class="p-4 bg-gray-50">
+                        <h4 class="font-bold text-lg">Client Profitability Dashboard</h4>
+                        <p class="text-sm text-gray-600">Real-time metrics, charts, and AI chat interface</p>
+                    </div>
+                </div>
+
+                <div class="screenshot-container">
+                    <img src="https://via.placeholder.com/600x400/3B82F6/ffffff?text=License+Management"
+                        alt="License Management" class="w-full">
+                    <div class="p-4 bg-gray-50">
+                        <h4 class="font-bold text-lg">Software License Intelligence</h4>
+                        <p class="text-sm text-gray-600">Usage monitoring, compliance tracking, cost optimization</p>
+                    </div>
+                </div>
+
+                <div class="screenshot-container">
+                    <img src="https://via.placeholder.com/600x400/9333EA/ffffff?text=Sales+Pipeline"
+                        alt="Sales Pipeline" class="w-full">
+                    <div class="p-4 bg-gray-50">
+                        <h4 class="font-bold text-lg">Sales Pipeline Optimization</h4>
+                        <p class="text-sm text-gray-600">Lead scoring, revenue forecasting, opportunity tracking</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="feature-card text-center">
+                    <i class="fas fa-mobile-alt text-3xl text-blue-600 mb-2"></i>
+                    <h5 class="font-bold">Responsive Design</h5>
+                    <p class="text-sm text-gray-600">Works on desktop, tablet, mobile</p>
+                </div>
+                <div class="feature-card text-center">
+                    <i class="fas fa-moon text-3xl text-purple-600 mb-2"></i>
+                    <h5 class="font-bold">Dark Mode</h5>
+                    <p class="text-sm text-gray-600">Full dark theme support</p>
+                </div>
+                <div class="feature-card text-center">
+                    <i class="fas fa-tachometer-alt text-3xl text-green-600 mb-2"></i>
+                    <h5 class="font-bold">Fast Performance</h5>
+                    <p class="text-sm text-gray-600">Optimized with Next.js 15</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 13: Performance Benchmarks -->
+    <section class="slide" id="slide-12">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-chart-bar mr-3"></i>Performance Benchmarks
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-blue-600">Frontend Performance</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Page Load Time</span>
+                                <span class="text-green-600 font-bold">1.2s</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-green-500 h-3 rounded-full" style="width: 95%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Time to Interactive</span>
+                                <span class="text-green-600 font-bold">1.8s</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-green-500 h-3 rounded-full" style="width: 92%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Lighthouse Score</span>
+                                <span class="text-green-600 font-bold">96/100</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-green-500 h-3 rounded-full" style="width: 96%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Bundle Size</span>
+                                <span class="text-green-600 font-bold">245 KB</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-green-500 h-3 rounded-full" style="width: 88%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-purple-600">AI Agent Performance</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Query Response Time</span>
+                                <span class="text-purple-600 font-bold">2.3s</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-purple-500 h-3 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Prediction Accuracy</span>
+                                <span class="text-purple-600 font-bold">95%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-purple-500 h-3 rounded-full" style="width: 95%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Concurrent Users</span>
+                                <span class="text-purple-600 font-bold">500+</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-purple-500 h-3 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">Uptime</span>
+                                <span class="text-purple-600 font-bold">99.9%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-3">
+                                <div class="bg-purple-500 h-3 rounded-full" style="width: 99%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-4">
+                <div class="stat-card">
+                    <div class="text-4xl font-bold mb-2">2.3s</div>
+                    <p class="text-sm">Avg Response Time</p>
+                </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold mb-2">95%</div>
+                    <p class="text-sm">AI Accuracy</p>
+                </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold mb-2">500+</div>
+                    <p class="text-sm">Concurrent Users</p>
+                </div>
+                <div class="stat-card">
+                    <div class="text-4xl font-bold mb-2">99.9%</div>
+                    <p class="text-sm">Uptime SLA</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 14: Future Development -->
+    <section class="slide" id="slide-13">
+        <div class="content-card">
+            <h2 class="text-4xl font-bold gradient-text mb-8">
+                <i class="fas fa-rocket mr-3"></i>Future Development Roadmap
+            </h2>
+
+            <div class="space-y-6 mb-8">
+                <div class="timeline-item">
+                    <h3 class="text-xl font-bold mb-2 text-purple-600">Phase 1: Enhanced Automation (Q2 2025)</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li><i class="fas fa-envelope text-blue-500 mr-2"></i><strong>Email Integration:</strong>
+                            Automated email notifications for alerts, reports, and recommendations</li>
+                        <li><i class="fas fa-robot text-purple-500 mr-2"></i><strong>Autonomous Agents:</strong> Agents
+                            can execute approved actions without human intervention</li>
+                        <li><i class="fas fa-calendar text-green-500 mr-2"></i><strong>Scheduled Reports:</strong>
+                            Daily, weekly, monthly automated report generation and delivery</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h3 class="text-xl font-bold mb-2 text-blue-600">Phase 2: Advanced Collaboration (Q3 2025)</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li><i class="fas fa-project-diagram text-orange-500 mr-2"></i><strong>Agent
+                                Orchestration:</strong> Complex multi-agent workflows for sophisticated problem-solving
+                        </li>
+                        <li><i class="fas fa-handshake text-indigo-500 mr-2"></i><strong>Consensus Decision
+                                Making:</strong> Agents vote on recommendations for higher accuracy</li>
+                        <li><i class="fas fa-bell text-red-500 mr-2"></i><strong>Predictive Cascading:</strong>
+                            Proactive alerts before issues occur based on pattern recognition</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h3 class="text-xl font-bold mb-2 text-green-600">Phase 3: Continuous Learning (Q4 2025)</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li><i class="fas fa-brain text-pink-500 mr-2"></i><strong>Reinforcement Learning:</strong>
+                            Agents learn from outcomes and improve recommendations</li>
+                        <li><i class="fas fa-chart-line text-teal-500 mr-2"></i><strong>Pattern Recognition:</strong>
+                            Identify company-specific patterns and trends</li>
+                        <li><i class="fas fa-graduation-cap text-yellow-500 mr-2"></i><strong>Knowledge Base
+                                Expansion:</strong> Continuously updated with industry best practices</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item">
+                    <h3 class="text-xl font-bold mb-2 text-orange-600">Phase 4: Enterprise Features (Q1 2026)</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li><i class="fas fa-users text-blue-500 mr-2"></i><strong>Multi-Tenant Support:</strong>
+                            White-label solution for MSPs to offer to their clients</li>
+                        <li><i class="fas fa-plug text-purple-500 mr-2"></i><strong>API Marketplace:</strong>
+                            Third-party integrations with PSA, RMM, and CRM tools</li>
+                        <li><i class="fas fa-shield-alt text-green-500 mr-2"></i><strong>Advanced Security:</strong> SOC
+                            2 compliance, SSO, audit logs</li>
+                        <li><i class="fas fa-mobile text-indigo-500 mr-2"></i><strong>Mobile Apps:</strong> Native iOS
+                            and Android applications</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 p-6 rounded-lg">
+                <h4 class="font-bold text-xl mb-3 text-purple-800">
+                    <i class="fas fa-star mr-2"></i>Vision: The Future of MSP Intelligence
+                </h4>
+                <p class="text-gray-700">
+                    Our goal is to create a fully autonomous AI ecosystem that not only analyzes and recommends but also
+                    learns, adapts, and executes - transforming MSPs into data-driven, highly efficient organizations
+                    that maximize profitability while delivering exceptional client value.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 15: Demo & Contact -->
+    <section class="slide" id="slide-14">
+        <div class="content-card text-center">
+            <h2 class="text-5xl font-bold gradient-text mb-6">
+                <i class="fas fa-play-circle mr-3"></i>See It In Action
+            </h2>
+
+            <p class="text-xl text-gray-600 mb-8">
+                Experience the power of collaborative AI agents for MSP optimization
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="feature-card text-center p-8">
+                    <i class="fab fa-github text-6xl text-gray-800 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-3">GitHub Repository</h3>
+                    <p class="text-gray-600 mb-4">Full source code, documentation, and deployment guides</p>
+                    <a href="https://github.com/yourusername/prism-insights" target="_blank"
+                        class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all">
+                        View on GitHub
+                    </a>
+                </div>
+
+                <div class="feature-card text-center p-8">
+                    <i class="fab fa-youtube text-6xl text-red-600 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-3">Demo Video</h3>
+                    <p class="text-gray-600 mb-4">Watch a complete walkthrough of all features and capabilities</p>
+                    <a href="https://youtube.com/watch?v=demo" target="_blank"
+                        class="inline-block bg-gradient-to-r from-red-600 to-pink-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all">
+                        Watch Demo
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-8 rounded-2xl mb-8">
+                <h3 class="text-3xl font-bold mb-4">Key Achievements</h3>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div>
+                        <div class="text-4xl font-bold mb-2">6</div>
+                        <div class="text-sm opacity-90">AI Agents</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold mb-2">15-25%</div>
+                        <div class="text-sm opacity-90">Revenue Growth</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold mb-2">20-30%</div>
+                        <div class="text-sm opacity-90">Cost Reduction</div>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-bold mb-2">95%</div>
+                        <div class="text-sm opacity-90">AI Accuracy</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-gray-600">
+                <p class="text-lg mb-4">
+                    <i class="fas fa-envelope mr-2"></i>
+                    <strong>Contact:</strong> team@prisminsights.ai
+                </p>
+                <p class="text-lg">
+                    <i class="fas fa-globe mr-2"></i>
+                    <strong>Website:</strong> www.prisminsights.ai
+                </p>
+            </div>
+
+            <div class="mt-8 pt-8 border-t-2 border-gray-200">
+                <p class="text-2xl font-bold gradient-text">
+                    Thank You!
+                </p>
+                <p class="text-gray-500 mt-2">
+                    Questions? Let's discuss how Prism Insights can transform your MSP business.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#667eea',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#764ba2',
+                lineColor: '#667eea',
+                secondaryColor: '#764ba2',
+                tertiaryColor: '#f3f4f6'
+            }
+        });
+
+        // Navigation
+        function scrollToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            slides[index].scrollIntoView({ behavior: 'smooth' });
+
+            // Update active dot
+            document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+        }
+
+        // Update active dot on scroll
+        window.addEventListener('scroll', () => {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.nav-dot');
+
+            slides.forEach((slide, index) => {
+                const rect = slide.getBoundingClientRect();
+                if (rect.top >= 0 && rect.top < window.innerHeight / 2) {
+                    dots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === index);
+                    });
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const slides = document.querySelectorAll('.slide');
+            const currentSlide = Array.from(slides).findIndex(slide => {
+                const rect = slide.getBoundingClientRect();
+                return rect.top >= 0 && rect.top < window.innerHeight / 2;
+            });
+
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                if (currentSlide < slides.length - 1) {
+                    scrollToSlide(currentSlide + 1);
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    scrollToSlide(currentSlide - 1);
+                }
+            }
+        });
+
+        // Print functionality
+        function printPresentation() {
+            window.print();
+        }
+
+        // Add print button
+        document.addEventListener('DOMContentLoaded', () => {
+            const printBtn = document.createElement('button');
+            printBtn.innerHTML = '<i class="fas fa-print"></i>';
+            printBtn.className = 'fixed bottom-8 right-8 bg-white text-purple-600 p-4 rounded-full shadow-lg hover:shadow-xl transition-all z-50';
+            printBtn.onclick = printPresentation;
+            document.body.appendChild(printBtn);
+        });
+    </script>
+</body>
+
+</html>
