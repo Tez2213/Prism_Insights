@@ -1,14 +1,21 @@
-# Prism Insights - Infrastructure
+# Prism Insights - AWS Infrastructure
 
-AWS CDK infrastructure for the Prism Insights AI-powered business intelligence platform. This infrastructure deploys AWS Bedrock Agents, Lambda functions, DynamoDB tables, and supporting services.
+AWS CDK infrastructure for deploying the Prism Insights AI agent ecosystem. This infrastructure provisions AWS Bedrock Agents, Lambda functions, DynamoDB tables, S3 buckets, and supporting services for a complete serverless MSP business intelligence platform.
 
 ## Overview
 
-This infrastructure code provisions a complete serverless architecture for running AI-powered business intelligence agents using AWS Bedrock. The platform includes three main agents:
+This infrastructure code deploys a production-ready serverless architecture for six collaborative AI agents powered by AWS Bedrock and Claude 3.5 Sonnet. The platform provides comprehensive business intelligence across all MSP operations.
 
-1. **Client Profitability Intelligence Agent** - Analyzes client profitability, predicts churn risk, and optimizes contracts
-2. **Software License Intelligence Agent** - Monitors license usage, ensures compliance, and identifies cost savings
-3. **Sales Pipeline Optimization Agent** - Optimizes sales processes, forecasts revenue, and identifies opportunities
+### Six AI Agents
+
+1. **Client Profitability Intelligence** - Analyzes margins, predicts churn, optimizes contracts
+2. **Software License Intelligence** - Monitors usage, ensures compliance, identifies savings
+3. **Sales Pipeline Optimization** - Forecasts revenue, scores leads, optimizes velocity
+4. **Resource Allocation Optimizer** - Tracks utilization, optimizes margins, plans capacity
+5. **Departmental Spend Analytics** - Monitors budgets, identifies waste, forecasts costs
+6. **Vendor & Contract Management** - Manages relationships, tracks renewals, negotiates terms
+
+Note: Currently, three agents (Client Profitability, Software License, Sales Pipeline) are fully implemented with AWS Bedrock integration. The remaining three agents have frontend dashboards and can be deployed following the same pattern.
 
 ## Architecture
 
